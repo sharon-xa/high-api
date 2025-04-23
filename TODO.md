@@ -1,6 +1,3 @@
 # TODO
 
-- [ ] Setup your database:
-  - [ ] pgx
-  - [ ] gorm
-- [ ] Setup your routes.
+- [x] Setup your database (gorm).
