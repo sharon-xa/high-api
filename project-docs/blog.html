@@ -1,344 +1,524 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>
+			Software Requirements Specification (SRS) for Blog Application
+		</title>
+		<style>
+			/* General Styles */
+			body {
+				font-family: "Arial", sans-serif;
+				line-height: 1.6;
+				margin: 0;
+				padding: 0;
+				background-color: #f9f9f9;
+				color: #333;
+				font-size: 1.2rem;
+			}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Software Requirements Specification (SRS) for Blog Application</title>
-    <style>
-        /* General Styles */
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
-            font-size: 1.2rem;
-        }
+			/* Container */
+			.container {
+				max-width: 800px;
+				margin: 20px auto;
+				padding: 40px;
+				background: #fff;
+				border: 1px solid #ddd;
+				border-radius: 8px;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			}
 
-        /* Container */
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 40px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+			/* Headings */
+			h1 {
+				font-size: 2em;
+				color: #2c3e50;
+				text-align: center;
+				margin-bottom: 20px;
+			}
 
-        /* Headings */
-        h1 {
-            font-size: 2em;
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 20px;
-        }
+			h2 {
+				font-size: 1.5em;
+				color: #34495e;
+				margin-top: 30px;
+				border-bottom: 2px solid #2c3e50;
+				padding-bottom: 5px;
+			}
 
-        h2 {
-            font-size: 1.5em;
-            color: #34495e;
-            margin-top: 30px;
-            border-bottom: 2px solid #2c3e50;
-            padding-bottom: 5px;
-        }
+			h3 {
+				font-size: 1.2em;
+				color: #2c3e50;
+				margin-top: 20px;
+			}
 
-        h3 {
-            font-size: 1.2em;
-            color: #2c3e50;
-            margin-top: 20px;
-        }
+			h4 {
+				font-size: 1em;
+				color: #2c3e50;
+				margin-top: 15px;
+			}
 
-        h4 {
-            font-size: 1em;
-            color: #2c3e50;
-            margin-top: 15px;
-        }
+			/* Paragraphs */
+			p {
+				margin: 10px 0;
+			}
 
-        /* Paragraphs */
-        p {
-            margin: 10px 0;
-        }
+			/* Lists */
+			ul {
+				margin: 10px 0;
+				padding-left: 20px;
+			}
 
-        /* Lists */
-        ul {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
+			li {
+				margin-bottom: 5px;
+			}
 
-        li {
-            margin-bottom: 5px;
-        }
+			/* Links */
+			a {
+				color: #3498db;
+				text-decoration: none;
+			}
 
-        /* Links */
-        a {
-            color: #3498db;
-            text-decoration: none;
-        }
+			a:hover {
+				text-decoration: underline;
+			}
 
-        a:hover {
-            text-decoration: underline;
-        }
+			/* Table */
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				margin: 20px 0;
+			}
 
-        /* Table */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
+			th,
+			td {
+				border: 1px solid #ddd;
+				padding: 10px;
+				text-align: left;
+			}
 
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
+			th {
+				background-color: #f4f4f4;
+				font-weight: bold;
+			}
 
-        th {
-            background-color: #f4f4f4;
-            font-weight: bold;
-        }
+			/* Footer */
+			footer {
+				text-align: center;
+				margin-top: 20px;
+				font-size: 0.9em;
+				color: #777;
+			}
+		</style>
+	</head>
 
-        /* Footer */
-        footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #777;
-        }
-    </style>
-</head>
+	<body>
+		<div class="container">
+			<h1>
+				Software Requirements Specification (SRS) for Blog Application
+			</h1>
 
-<body>
-    <div class="container">
-        <h1>Software Requirements Specification (SRS) for Blog Application</h1>
+			<h2>1. Introduction</h2>
+			<h3>1.1 Purpose</h3>
+			<p>
+				This document specifies the requirements for the development of
+				a full-stack blog application. The system will allow users to
+				create, read, update, and delete blog posts, manage user
+				accounts, and interact with other users through comments. The
+				backend will be built using <strong>Go</strong>, the frontend
+				will use <strong>React</strong>, and
+				<strong>PostgreSQL</strong> will serve as the database. The
+				application will provide a seamless and user-friendly experience
+				for both readers and content creators.
+			</p>
 
-        <h2>1. Introduction</h2>
-        <h3>1.1 Purpose</h3>
-        <p>
-            This document specifies the requirements for the development of a full-stack blog application. The system
-            will allow users to create, read, update, and delete blog posts, manage user accounts, and interact with
-            other users through comments. The backend will be built using <strong>Go</strong>, the frontend will use
-            <strong>React</strong>, and <strong>PostgreSQL</strong> will serve as the database. The application will
-            provide a seamless and user-friendly experience for both readers and content creators.
-        </p>
+			<h3>1.2 Scope</h3>
+			<ul>
+				<li>
+					Allow users to register, log in, and manage their accounts.
+				</li>
+				<li>Enable users to create, edit, and delete blog posts.</li>
+				<li>Allow users to view and search for blog posts.</li>
+				<li>Enable users to comment on blog posts.</li>
+				<li>Provide an admin panel for managing users and posts.</li>
+				<li>Support rich text formatting for blog posts.</li>
+				<li>
+					Provide a responsive design for mobile and desktop users.
+				</li>
+			</ul>
 
-        <h3>1.2 Scope</h3>
-        <ul>
-            <li>Allow users to register, log in, and manage their accounts.</li>
-            <li>Enable users to create, edit, and delete blog posts.</li>
-            <li>Allow users to view and search for blog posts.</li>
-            <li>Enable users to comment on blog posts.</li>
-            <li>Provide an admin panel for managing users and posts.</li>
-            <li>Support rich text formatting for blog posts.</li>
-            <li>Provide a responsive design for mobile and desktop users.</li>
-        </ul>
+			<h3>1.3 Definitions, Acronyms, and Abbreviations</h3>
+			<ul>
+				<li><strong>API</strong>: Application Programming Interface</li>
+				<li><strong>CRUD</strong>: Create, Read, Update, Delete</li>
+				<li>
+					<strong>Admin</strong>: A system administrator who oversees
+					the platform
+				</li>
+				<li><strong>Post</strong>: A blog entry created by a user</li>
+				<li>
+					<strong>Comment</strong>: A user’s response to a blog post
+				</li>
+			</ul>
 
-        <h3>1.3 Definitions, Acronyms, and Abbreviations</h3>
-        <ul>
-            <li><strong>API</strong>: Application Programming Interface</li>
-            <li><strong>CRUD</strong>: Create, Read, Update, Delete</li>
-            <li><strong>Admin</strong>: A system administrator who oversees the platform</li>
-            <li><strong>Post</strong>: A blog entry created by a user</li>
-            <li><strong>Comment</strong>: A user’s response to a blog post</li>
-        </ul>
+			<h3>1.4 References</h3>
+			<ul>
+				<li>
+					React Documentation:
+					<a href="https://reactjs.org/docs"
+						>https://reactjs.org/docs</a
+					>
+				</li>
+				<li>
+					Go Documentation:
+					<a href="https://golang.org/doc">https://golang.org/doc</a>
+				</li>
+				<li>
+					PostgreSQL Documentation:
+					<a href="https://www.postgresql.org/docs"
+						>https://www.postgresql.org/docs</a
+					>
+				</li>
+			</ul>
 
-        <h3>1.4 References</h3>
-        <ul>
-            <li>React Documentation: <a href="https://reactjs.org/docs">https://reactjs.org/docs</a></li>
-            <li>Go Documentation: <a href="https://golang.org/doc">https://golang.org/doc</a></li>
-            <li>PostgreSQL Documentation: <a href="https://www.postgresql.org/docs">https://www.postgresql.org/docs</a>
-            </li>
-        </ul>
+			<h2>2. System Overview</h2>
+			<p>
+				The blog application will consist of a
+				<strong>React-based frontend</strong>, a
+				<strong>Go-based backend API</strong>, and a
+				<strong>PostgreSQL database</strong>. The system will handle:
+			</p>
+			<ul>
+				<li>User authentication and authorization.</li>
+				<li>Blog post management (CRUD operations).</li>
+				<li>Comment management (CRUD operations).</li>
+				<li>Admin functionalities for managing users and posts.</li>
+				<li>Search and filtering of blog posts and users.</li>
+				<li>Responsive design for mobile and desktop users.</li>
+			</ul>
 
-        <h2>2. System Overview</h2>
-        <p>
-            The blog application will consist of a <strong>React-based frontend</strong>, a <strong>Go-based backend
-                API</strong>, and a <strong>PostgreSQL database</strong>. The system will handle:
-        </p>
-        <ul>
-            <li>User authentication and authorization.</li>
-            <li>Blog post management (CRUD operations).</li>
-            <li>Comment management (CRUD operations).</li>
-            <li>Admin functionalities for managing users and posts.</li>
-            <li>Search and filtering of blog posts.</li>
-            <li>Responsive design for mobile and desktop users.</li>
-        </ul>
+			<h2>3. Functional Requirements</h2>
+			<h3>3.1 User Roles</h3>
+			<h4>3.1.1 Visitor</h4>
+			<ul>
+				<li>
+					<strong>Browse public content</strong>: View published blog
+					posts.
+				</li>
+				<li>
+					<strong>Search posts</strong>: Search for posts by title,
+					tags, or category.
+				</li>
+			</ul>
 
-        <h2>3. Functional Requirements</h2>
-        <h3>3.1 User Roles</h3>
-        <h4>3.1.1 Regular User</h4>
-        <ul>
-            <li><strong>Register and log in</strong>: Create an account and log in to the system.</li>
-            <li><strong>Create a blog post</strong>: Write and publish a new blog post.</li>
-            <li><strong>Edit or delete a blog post</strong>: Modify or remove their own blog posts.</li>
-            <li><strong>View blog posts</strong>: Browse and read blog posts.</li>
-            <li><strong>Comment on posts</strong>: Add, edit, or delete comments on blog posts.</li>
-            <li><strong>Search posts</strong>: Search for blog posts by title, tags, or content.</li>
-        </ul>
+			<h4>3.1.2 User</h4>
+			<ul>
+				<li>
+					<strong>Register and log in</strong>: Create an account and
+					log in.
+				</li>
+				<li>
+					<strong>Verify email via OTP</strong>: Activate account by
+					submitting a valid email OTP.
+				</li>
+				<li>
+					<strong>Create a blog post</strong>: Write and publish new
+					blog content.
+				</li>
+				<li>
+					<strong>Edit or delete a blog post</strong>: Modify or
+					remove their own posts.
+				</li>
+				<li>
+					<strong>Comment on posts</strong>: Add, edit, or delete
+					comments on blog posts.
+				</li>
+				<li>
+					<strong>View dashboard</strong>: View their authored posts
+					and comments.
+				</li>
+			</ul>
 
-        <h4>3.1.2 Admin</h4>
-        <ul>
-            <li><strong>Manage users</strong>: Add, edit, or deactivate user accounts.</li>
-            <li><strong>Manage posts</strong>: View, edit, or delete any blog post.</li>
-            <li><strong>Monitor comments</strong>: Review and delete inappropriate comments.</li>
-            <li><strong>Generate reports</strong>: Export data on user activity and blog statistics.</li>
-        </ul>
+			<h4>3.1.3 Admin</h4>
+			<ul>
+				<li>
+					<strong>Manage users</strong>: View, promote/demote, or
+					deactivate accounts.
+				</li>
+				<li>
+					<strong>Manage posts</strong>: View, edit, or delete any
+					blog post.
+				</li>
+				<li>
+					<strong>Monitor comments</strong>: Delete inappropriate
+					comments or spam.
+				</li>
+				<li>
+					<strong>Generate reports</strong>: Export data on user
+					activity and content trends.
+				</li>
+			</ul>
 
-        <h3>3.2 Features</h3>
-        <h4>3.2.1 User Registration and Authentication</h4>
-        <ul>
-            <li>Secure user registration with email verification.</li>
-            <li>Login with email and password.</li>
-            <li>Password reset functionality.</li>
-        </ul>
+			<h3>3.2 Features</h3>
+			<h4>3.2.1 User Registration and Authentication</h4>
+			<ul>
+				<li>Secure user registration with email verification.</li>
+				<li>Login with email and password.</li>
+				<li>Password reset functionality.</li>
+			</ul>
 
-        <h4>3.2.2 Blog Post Management</h4>
-        <ul>
-            <li>Create, view, update, and delete blog posts.</li>
-            <li>Support for rich text formatting (e.g., bold, italics, headings).</li>
-            <li>Add tags to blog posts for categorization.</li>
-            <li>Upload images to include in blog posts.</li>
-        </ul>
+			<h4>3.2.2 Blog Post Management</h4>
+			<ul>
+				<li>Create, view, update, and delete blog posts.</li>
+				<li>
+					Support for rich text formatting (e.g., bold, italics,
+					headings).
+				</li>
+				<li>
+					Add tags and category to a blog post for categorization.
+				</li>
+			</ul>
 
-        <h4>3.2.3 Comment Management</h4>
-        <ul>
-            <li>Add comments to blog posts.</li>
-            <li>Edit or delete comments (only by the comment owner or admin).</li>
-            <li>Display comments in chronological order.</li>
-        </ul>
+			<h4>3.2.3 Comment Management</h4>
+			<ul>
+				<li>Add comments to blog posts.</li>
+				<li>
+					Edit or delete comments (only by the comment owner or
+					admin).
+				</li>
+				<li>Display comments in chronological order.</li>
+			</ul>
 
-        <h4>3.2.4 Search and Filtering</h4>
-        <ul>
-            <li>Search for blog posts by title, tags, or content.</li>
-            <li>Filter posts by date, popularity, or tags.</li>
-        </ul>
+			<h4>3.2.4 Search and Filtering</h4>
+			<ul>
+				<li>Search for blog posts by title, tags, or content.</li>
+				<li>Filter posts by date, categories, or tags.</li>
+			</ul>
 
-        <h4>3.2.5 Notifications</h4>
-        <ul>
-            <li>Notify users of new comments on their posts.</li>
-            <li>Notify users of updates to posts they follow.</li>
-        </ul>
+			<h4>3.2.5 Notifications</h4>
+			<ul>
+				<li>Notify users of new comments on their posts.</li>
+			</ul>
 
-        <h4>3.2.6 Admin Dashboard</h4>
-        <ul>
-            <li>View a summary of system activity (e.g., number of posts, users, comments).</li>
-            <li>Filter and search for users and posts.</li>
-            <li>Export data to CSV or Excel.</li>
-        </ul>
+			<h4>3.2.6 Admin Dashboard</h4>
+			<ul>
+				<li>
+					View a summary of system activity (e.g., number of posts,
+					users, comments).
+				</li>
+				<li>Filter and search for users and posts.</li>
+				<li>Export data to CSV or Excel.</li>
+			</ul>
 
-        <h2>4. Non-Functional Requirements</h2>
-        <h3>4.1 Performance</h3>
-        <ul>
-            <li>The system should support up to 5,000 concurrent users.</li>
-            <li>API responses should be delivered within 200ms on average.</li>
-        </ul>
+			<h2>4. Non-Functional Requirements</h2>
+			<h3>4.1 Performance</h3>
+			<ul>
+				<li>The system should support up to 5,000 concurrent users.</li>
+				<li>
+					API responses should be delivered within 200ms on average.
+				</li>
+			</ul>
 
-        <h3>4.2 Security</h3>
-        <ul>
-            <li>Use HTTPS for secure data transmission.</li>
-            <li>Store sensitive data (passwords) using encryption.</li>
-            <li>Implement role-based access control (RBAC).</li>
-            <li>Protect against common web vulnerabilities (e.g., SQL injection, XSS).</li>
-        </ul>
+			<h3>4.2 Security</h3>
+			<ul>
+				<li>Use HTTPS for secure data transmission.</li>
+				<li>Store sensitive data (passwords) using encryption.</li>
+				<li>Implement role-based access control (RBAC).</li>
+				<li>
+					Protect against common web vulnerabilities (e.g., SQL
+					injection, XSS).
+				</li>
+			</ul>
 
-        <h3>4.3 Scalability</h3>
-        <ul>
-            <li>Design the system to handle growth in user base and content.</li>
-            <li>Use cloud-based infrastructure for scalability.</li>
-        </ul>
+			<h3>4.3 Scalability</h3>
+			<ul>
+				<li>
+					Design the system to handle growth in user base and content.
+				</li>
+				<li>Use cloud-based infrastructure for scalability.</li>
+			</ul>
 
-        <h3>4.4 Availability</h3>
-        <ul>
-            <li>Ensure 99.9% uptime with robust error handling and retry mechanisms.</li>
-        </ul>
+			<h3>4.4 Availability</h3>
+			<ul>
+				<li>
+					Ensure 99.9% uptime with robust error handling and retry
+					mechanisms.
+				</li>
+			</ul>
 
-        <h2>5. API Specifications</h2>
-        <h3>5.1 Authentication API</h3>
-        <ul>
-            <li><strong>POST /auth/register</strong>: Register a new user.</li>
-            <li><strong>POST /auth/login</strong>: Authenticate user and issue a token.</li>
-            <li><strong>POST /auth/forgot-password</strong>: Initiate password reset.</li>
-        </ul>
+			<h2>5. API Specifications</h2>
+			<h3>5.1 Authentication API</h3>
+			<ul>
+				<li>
+					<strong>POST /auth/register</strong>: Register a new user.
+				</li>
+				<li>
+					<strong>POST /auth/verify-email</strong>: Verify a user's
+					account using an OTP.
+				</li>
+				<li>
+					<strong>POST /auth/login</strong>: Authenticate user and
+					issue a token.
+				</li>
+				<li>
+					<strong>POST /auth/forgot-password</strong>: Initiate
+					password reset.
+				</li>
+				<li>
+					<strong>POST /auth/reset-password</strong>: Reset a user's
+					password using the token.
+				</li>
+			</ul>
 
-        <h3>5.2 Blog Post API</h3>
-        <ul>
-            <li><strong>POST /posts</strong>: Create a new blog post.</li>
-            <li><strong>GET /posts</strong>: List all blog posts.</li>
-            <li><strong>GET /posts/{id}</strong>: Retrieve details of a specific blog post.</li>
-            <li><strong>PUT /posts/{id}</strong>: Update a blog post.</li>
-            <li><strong>DELETE /posts/{id}</strong>: Delete a blog post.</li>
-        </ul>
+			<h3>5.2 Blog Post API</h3>
+			<ul>
+				<li><strong>POST /posts</strong>: Create a new blog post.</li>
+				<li><strong>GET /posts</strong>: List all blog posts.</li>
+				<li>
+					<strong>GET /posts/{id}</strong>: Retrieve details of a
+					specific blog post.
+				</li>
+				<li><strong>PUT /posts/{id}</strong>: Update a blog post.</li>
+				<li>
+					<strong>DELETE /posts/{id}</strong>: Delete a blog post.
+				</li>
+			</ul>
 
-        <h3>5.3 Comment API</h3>
-        <ul>
-            <li><strong>POST /posts/{id}/comments</strong>: Add a comment to a blog post.</li>
-            <li><strong>GET /posts/{id}/comments</strong>: List all comments for a blog post.</li>
-            <li><strong>PUT /comments/{id}</strong>: Update a comment.</li>
-            <li><strong>DELETE /comments/{id}</strong>: Delete a comment.</li>
-        </ul>
+			<h3>5.3 Comment API</h3>
+			<ul>
+				<li>
+					<strong>POST /posts/{id}/comments</strong>: Add a comment to
+					a blog post.
+				</li>
+				<li>
+					<strong>GET /posts/{id}/comments</strong>: List all comments
+					for a blog post.
+				</li>
+				<li><strong>PUT /comments/{id}</strong>: Update a comment.</li>
+				<li>
+					<strong>DELETE /comments/{id}</strong>: Delete a comment.
+				</li>
+			</ul>
 
-        <h3>5.4 Admin API</h3>
-        <ul>
-            <li><strong>GET /admin/users</strong>: Retrieve all users.</li>
-            <li><strong>PUT /admin/users/{id}</strong>: Update user details.</li>
-            <li><strong>DELETE /admin/users/{id}</strong>: Deactivate a user account.</li>
-            <li><strong>GET /admin/posts</strong>: Retrieve all blog posts.</li>
-        </ul>
+			<h3>5.4 Category API</h3>
+			<ul>
+				<li>
+					<strong>Get /categories</strong>: Retrieve all categories.
+				</li>
+			</ul>
 
-        <h2>6. Database Design</h2>
-        <h3>6.1 Tables</h3>
-        <ul>
-            <li><strong>Users</strong>: id, name, email, password, role, created_at</li>
-            <li><strong>Posts</strong>: id, user_id, title, content, tags, created_at, updated_at</li>
-            <li><strong>Comments</strong>: id, post_id, user_id, content, created_at</li>
-            <li><strong>Tags</strong>: id, name</li>
-        </ul>
+			<h3>5.5 Admin API</h3>
+			<ul>
+				<li><strong>GET /admin/users</strong>: Retrieve all users.</li>
+				<li>
+					<strong>PUT /admin/users/{id}</strong>: Update user details.
+				</li>
+				<li>
+					<strong>DELETE /admin/users/{id}</strong>: Deactivate a user
+					account.
+				</li>
+				<li>
+					<strong>GET /admin/posts</strong>: Retrieve all blog posts.
+				</li>
+				<li>
+					<strong>POST /admin/category</strong>: Add a new category.
+				</li>
+				<li>
+					<strong>PUT /admin/category/{id}</strong>: Update a
+					category.
+				</li>
+				<li>
+					<strong>DELETE /admin/category/{id}</strong>: Delete a
+					category.
+				</li>
+			</ul>
 
-        <h3>6.2 Relationships</h3>
-        <ul>
-            <li>One user can have multiple blog posts.</li>
-            <li>One blog post can have multiple comments.</li>
-            <li>One blog post can have multiple tags.</li>
-        </ul>
+			<h2>6. Database Design</h2>
+			<h3>6.1 Tables</h3>
+			<ul>
+				<li>
+					<strong>Users</strong>: id, name, gender, image, bio, email,
+					password, role, verified, created_at, updated_at, deleted_at
+				</li>
+				<li>
+					<strong>Posts</strong>: id, user_id, category_id, title,
+					content, created_at, updated_at, deleted_at
+				</li>
+				<li>
+					<strong>Comments</strong>: id, post_id, user_id, content,
+					created_at, updated_at, deleted_at
+				</li>
+				<li><strong>Tags</strong>: id, name</li>
+				<li><strong>PostTags</strong>: post_id, tag_id</li>
+				<li><strong>Categories</strong>: id, name</li>
+			</ul>
 
-        <h2>7. Deployment Plan</h2>
-        <h3>7.1 Development Environment</h3>
-        <ul>
-            <li><strong>Backend</strong>: Go</li>
-            <li><strong>Frontend</strong>: React</li>
-            <li><strong>Database</strong>: PostgreSQL</li>
-            <li><strong>Hosting</strong>: AWS or Heroku</li>
-        </ul>
+			<h3>6.2 Relationships</h3>
+			<ul>
+				<li>One user can have multiple blog posts.</li>
+				<li>One user can have multiple comments.</li>
+				<li>One user can have multiple password reset tokens.</li>
+				<li>One user can have multiple account verification OTPs.</li>
+				<li>One blog post can have multiple comments.</li>
+				<li>
+					One blog post can have multiple tags (many-to-many
+					relationship).
+				</li>
+				<li>One blog post belongs to one user.</li>
+				<li>One blog post belongs to one category.</li>
+				<li>One comment belongs to one user and one blog post.</li>
+				<li>
+					One tag can be associated with multiple posts (many-to-many
+					relationship).
+				</li>
+				<li>One category can have multiple posts.</li>
+			</ul>
 
-        <h3>7.2 Testing</h3>
-        <ul>
-            <li>Unit tests for all endpoints.</li>
-            <li>Integration tests for frontend and backend.</li>
-            <li>Performance and security testing.</li>
-        </ul>
+			<h2>7. Deployment Plan</h2>
+			<h3>7.1 Development Environment</h3>
+			<ul>
+				<li><strong>Backend</strong>: Go</li>
+				<li><strong>Frontend</strong>: React</li>
+				<li><strong>Database</strong>: PostgreSQL</li>
+				<li><strong>Hosting</strong>: AWS or Heroku</li>
+			</ul>
 
-        <h3>7.3 Deployment</h3>
-        <ul>
-            <li>Use CI/CD pipelines for automated deployment.</li>
-            <li>Deploy on a cloud platform (AWS, Heroku).</li>
-            <li>Set up monitoring tools (e.g., New Relic, Datadog).</li>
-        </ul>
+			<h3>7.2 Testing</h3>
+			<ul>
+				<li>Unit tests for all endpoints.</li>
+				<li>Integration tests for frontend and backend.</li>
+				<li>Performance and security testing.</li>
+			</ul>
 
-        <h2>8. Future Enhancements</h2>
-        <ul>
-            <li>Add support for multiple languages (i18n).</li>
-            <li>Implement a "like" or "upvote" system for posts and comments.</li>
-            <li>Add a subscription feature for users to follow specific authors.</li>
-            <li>Enable advanced analytics for post performance (e.g., views, shares).</li>
-            <li>Add mobile app support for content creation and reading.</li>
-        </ul>
+			<h3>7.3 Deployment</h3>
+			<ul>
+				<li>Use CI/CD pipelines for automated deployment.</li>
+				<li>Deploy on a cloud platform (AWS, Heroku).</li>
+				<li>Set up monitoring tools (e.g., New Relic, Datadog).</li>
+			</ul>
 
-        <footer>
-            <p>© 2025 Blog Application SRS</p>
-        </footer>
-    </div>
-</body>
+			<h2>8. Future Enhancements</h2>
+			<ul>
+				<li>Add support for multiple languages (i18n).</li>
+				<li>
+					Implement a "like" or "upvote" system for posts and
+					comments.
+				</li>
+				<li>
+					Add a subscription feature for users to follow specific
+					authors.
+				</li>
+				<li>
+					Enable advanced analytics for post performance (e.g., views,
+					shares).
+				</li>
+				<li>
+					Add mobile app support for content creation and reading.
+				</li>
+			</ul>
 
+			<footer>
+				<p>© 2025 Blog Application SRS</p>
+			</footer>
+		</div>
+	</body>
 </html>
