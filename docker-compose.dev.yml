@@ -1,0 +1,36 @@
+services:
+    high-database:
+        image: postgres:latest
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: ${DB_DATABASE}
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        ports:
+            - "${DB_PORT}:5432"
+        volumes:
+            - psql_volume_bp:/var/lib/postgresql/data
+
+    high-api:
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        container_name: high-api
+        restart: unless-stopped
+        depends_on:
+            - high-database
+        environment:
+            DB_DATABASE: ${DB_DATABASE}
+            DB_USERNAME: ${DB_USERNAME}
+            DB_PASSWORD: ${DB_PASSWORD}
+            DB_HOST: high-database
+            DB_PORT: 5432
+        ports:
+            - "8080:8080"
+        volumes:
+            - .:/app
+            - ~/go/pkg:/go/pkg
+        command: ["air"]
+
+volumes:
+    psql_volume_bp:

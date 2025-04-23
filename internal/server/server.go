@@ -8,8 +8,7 @@ import (
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
-
-	"high-api/internal/database"
+	"github.com/refine-software/high-api/internal/database"
 )
 
 type Server struct {

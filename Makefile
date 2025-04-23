@@ -30,6 +30,14 @@ docker-down:
 		docker-compose down; \
 	fi
 
+docker-dev:
+	@echo "Building and starting containers in development mode..."
+	docker compose -f docker-compose.dev.yml up --build -d
+
+docker-dev-down:
+	@echo "Stopping development containers..."
+	docker compose -f docker-compose.dev.yml down
+
 # Test the application
 test:
 	@echo "Testing..."
@@ -61,4 +69,4 @@ watch:
             fi; \
         fi
 
-.PHONY: all build run test clean watch docker-run docker-down itest
+.PHONY: all build run test clean watch docker-run docker-down docker-dev-down docker-dev itest
