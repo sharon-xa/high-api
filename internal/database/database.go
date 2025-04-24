@@ -10,9 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Service represents a service that interacts with a database.
-type Service interface{}
-
 type service struct {
 	db *gorm.DB
 }
@@ -28,7 +25,7 @@ var (
 	dbInstance *service
 )
 
-func New() Service {
+func New() *service {
 	// Reuse Connection
 	if dbInstance != nil {
 		return dbInstance
@@ -50,4 +47,24 @@ func New() Service {
 		db: db,
 	}
 	return dbInstance
+}
+
+func (s *service) DB() *gorm.DB {
+	return s.db
+}
+
+func (s *service) AutoMigrate() {
+	err := s.db.AutoMigrate(
+		&User{},
+		&AccountVerificationOTP{},
+		&PasswordResetToken{},
+		&Post{},
+		&Comment{},
+		&Tag{},
+		&PostTag{},
+		&Category{},
+	)
+	if err != nil {
+		log.Fatalf("AutoMigrate failed: %v", err)
+	}
 }

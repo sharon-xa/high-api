@@ -9,20 +9,24 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/refine-software/high-api/internal/database"
+	"gorm.io/gorm"
 )
 
 type Server struct {
 	port int
 
-	db database.Service
+	db *gorm.DB
 }
 
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
+
+	dbService := database.New()
+	dbService.AutoMigrate()
+
 	NewServer := &Server{
 		port: port,
-
-		db: database.New(),
+		db:   dbService.DB(),
 	}
 
 	// Declare Server config
