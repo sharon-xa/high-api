@@ -406,19 +406,62 @@
 				</li>
 			</ul>
 
-			<h3>5.5 Admin API</h3>
+			<h3>5.5 User API</h3>
 			<ul>
-				<li><strong>GET /admin/users</strong>: Retrieve all users.</li>
 				<li>
-					<strong>PUT /admin/users/{id}</strong>: Update user details.
+					<strong>GET /users</strong>: Retrieve a list of all users
+					(public info only).
 				</li>
 				<li>
-					<strong>DELETE /admin/users/{id}</strong>: Deactivate a user
-					account.
+					<strong>GET /users/{id}</strong>: Retrieve the profile of a
+					specific user.
 				</li>
 				<li>
-					<strong>GET /admin/posts</strong>: Retrieve all blog posts.
+					<strong>PUT /users/{id}</strong>: Update the authenticated
+					user's profile (name, bio, image, etc.).
 				</li>
+				<li>
+					<strong>DELETE /users/{id}</strong>: Delete the
+					authenticated user's account (self-deletion).
+				</li>
+			</ul>
+
+			<h3>5.6 Tag API</h3>
+			<ul>
+				<li>
+					<strong>GET /tags</strong>: Retrieve a list of all tags (for
+					filtering and autocomplete).
+				</li>
+				<li>
+					<strong>GET /tags/{name}</strong>: Retrieve all posts
+					associated with a specific tag.
+				</li>
+			</ul>
+
+			<h3>5.7 Admin API</h3>
+			<ul>
+				<li>
+					<strong>POST /admin/users/{id}/ban</strong>: Temporarily or
+					permanently ban a user.
+				</li>
+				<li>
+					<strong>POST /admin/users/{id}/promote</strong>: Promote a
+					user to admin or moderator role.
+				</li>
+
+				<li>
+					<strong>DELETE /admin/posts/{id}</strong>: Delete any blog
+					post.
+				</li>
+
+				<li>
+					<strong>GET /admin/comments</strong>: View all comments.
+				</li>
+				<li>
+					<strong>DELETE /admin/comments/{id}</strong>: Delete a
+					comment.
+				</li>
+
 				<li>
 					<strong>POST /admin/category</strong>: Add a new category.
 				</li>
@@ -429,6 +472,17 @@
 				<li>
 					<strong>DELETE /admin/category/{id}</strong>: Delete a
 					category.
+				</li>
+
+				<li>
+					<strong>DELETE /admin/tags/{id}</strong>: Delete a tag (for
+					moderation or cleanup).
+				</li>
+				<li><strong>PUT /admin/tags/{id}</strong>: Rename a tag.</li>
+
+				<li>
+					<strong>GET /admin/stats</strong>: View system statistics
+					and analytics.
 				</li>
 			</ul>
 
