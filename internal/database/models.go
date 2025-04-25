@@ -23,9 +23,8 @@ type User struct {
 
 type AccountVerificationOTP struct {
 	gorm.Model
-	UserID    uint `gorm:"index"`
+	UserID    uint `gorm:"index;constraint:OnDelete:CASCADE;"`
 	OTP       string
-	Verified  bool `gorm:"default:false"`
 	ExpiresAt time.Time
 }
 
