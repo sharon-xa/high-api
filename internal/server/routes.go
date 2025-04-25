@@ -27,8 +27,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 func (s *Server) registerPublicRoutes(e *gin.Engine) {
 	auth := e.Group("/auth")
 
-	auth.POST("/register")
-	auth.POST("/verify-email")
+	auth.POST("/register", s.register)
+	auth.POST("/verify-email", s.verifyEmail)
 	auth.POST("/login")
 	auth.POST("/forgot-password")
 	auth.POST("/reset-password")
