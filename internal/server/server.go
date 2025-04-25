@@ -3,11 +3,10 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/refine-software/high-api/internal/config"
 	"github.com/refine-software/high-api/internal/database"
 	"gorm.io/gorm"
 )
@@ -15,18 +14,20 @@ import (
 type Server struct {
 	port int
 
-	db *gorm.DB
+	db  *gorm.DB
+	env *config.Env
 }
 
 func NewServer() *http.Server {
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
+	env := config.NewEnv()
 
-	dbService := database.New()
+	dbService := database.New(env.DSN)
 	dbService.AutoMigrate()
 
 	NewServer := &Server{
-		port: port,
+		port: env.Port,
 		db:   dbService.DB(),
+		env:  env,
 	}
 
 	// Declare Server config
