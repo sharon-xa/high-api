@@ -43,6 +43,7 @@ func (s *service) AutoMigrate() {
 		&Tag{},
 		&PostTag{},
 		&Category{},
+		&RefreshToken{},
 	)
 	if err != nil {
 		log.Fatalf("AutoMigrate failed: %v", err)

@@ -20,6 +20,7 @@ type User struct {
 	Posts                  []Post
 	Comments               []Comment
 	AccountVerificationOTP AccountVerificationOTP `gorm:"constraint:OnDelete:CASCADE;"`
+	RefreshTokens          []RefreshToken
 }
 
 type AccountVerificationOTP struct {
@@ -34,6 +35,16 @@ type PasswordResetToken struct {
 	UserID    uint   `gorm:"index"`
 	Token     string `gorm:"unique"`
 	ExpiresAt time.Time
+}
+
+type RefreshToken struct {
+	gorm.Model
+	UserID       uint      `gorm:"index;not null"`
+	User         User      `gorm:"constraint:OnDelete:CASCADE;"`
+	RefreshToken string    `gorm:"not null"`
+	ExpiresAt    time.Time `gorm:"not null"`
+	Revoked      bool      `gorm:"default:false"`
+	DeviceID     string    `gorm:"not null;unique"`
 }
 
 type Post struct {
