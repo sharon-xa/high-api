@@ -17,13 +17,14 @@ type User struct {
 	Role     string `gorm:"default:'user'"`
 	Verified bool   `gorm:"default:false"`
 
-	Posts    []Post
-	Comments []Comment
+	Posts                  []Post
+	Comments               []Comment
+	AccountVerificationOTP AccountVerificationOTP `gorm:"constraint:OnDelete:CASCADE;"`
 }
 
 type AccountVerificationOTP struct {
 	gorm.Model
-	UserID    uint `gorm:"index;constraint:OnDelete:CASCADE;"`
+	UserID    uint `gorm:"uniqueIndex"`
 	OTP       string
 	ExpiresAt time.Time
 }
