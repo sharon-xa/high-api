@@ -12,7 +12,7 @@ func convParamToInt(c *gin.Context, param string) int32 {
 	paramStr := c.Param(param)
 	paramInt, err := strconv.Atoi(paramStr)
 	if err != nil || paramInt <= 0 {
-		utils.FailResponse(c, utils.ErrBadRequest, err)
+		utils.Fail(c, utils.ErrBadRequest, err)
 		return 0
 	}
 
@@ -23,7 +23,7 @@ func convParamToInt(c *gin.Context, param string) int32 {
 func convStrToInt32(c *gin.Context, str string) int32 {
 	convertedInt, err := strconv.Atoi(str)
 	if err != nil {
-		utils.FailResponse(c, utils.ErrInternal, err)
+		utils.Fail(c, utils.ErrInternal, err)
 		return 0
 	}
 
@@ -33,7 +33,7 @@ func convStrToInt32(c *gin.Context, str string) int32 {
 func getHeader(c *gin.Context, key string) string {
 	header := strings.TrimSpace(c.GetHeader(key))
 	if header == "" {
-		utils.FailResponse(
+		utils.Fail(
 			c,
 			utils.ErrHeaderMissing(key),
 			nil,

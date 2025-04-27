@@ -8,6 +8,7 @@ import (
 	"github.com/refine-software/high-api/internal/auth"
 	"github.com/refine-software/high-api/internal/database"
 	"github.com/refine-software/high-api/internal/utils"
+	"gorm.io/gorm"
 )
 
 type registerReq struct {
@@ -21,13 +22,13 @@ func (s *Server) register(c *gin.Context) {
 	var req registerReq
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		utils.FailResponse(c, utils.ErrBadRequest, nil)
+		utils.Fail(c, utils.ErrBadRequest, nil)
 		return
 	}
 
 	hashedPass, err := utils.HashPassword(req.Password)
 	if err != nil {
-		utils.FailResponse(c, utils.ErrInternal, err)
+		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
 
@@ -48,7 +49,7 @@ func (s *Server) register(c *gin.Context) {
 	tx := s.db.Begin()
 	defer tx.Rollback()
 	if err := tx.Error; err != nil {
-		utils.FailResponse(c, utils.ErrInternal, err)
+		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
 
@@ -57,7 +58,7 @@ func (s *Server) register(c *gin.Context) {
 		if !utils.ValidateUniqueness(c, err, "user") {
 			return
 		}
-		utils.FailResponse(c, utils.ErrInternal, tx.Error)
+		utils.Fail(c, utils.ErrInternal, tx.Error)
 		return
 	}
 
@@ -71,23 +72,23 @@ func (s *Server) register(c *gin.Context) {
 
 	err = tx.Create(&a).Error
 	if err != nil {
-		utils.FailResponse(c, utils.ErrInternal, err)
+		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
 
 	err = auth.SendVerificationEmail(u.Email, otp, s.env)
 	if err != nil {
-		utils.FailResponse(c, utils.ErrInternal, err)
+		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
 
 	err = tx.Commit().Error
 	if err != nil {
-		utils.FailResponse(c, utils.ErrInternal, err)
+		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
 
-	c.Status(http.StatusCreated)
+	utils.Success(c, "account created", nil)
 }
 
 type verifyEmailReq struct {

@@ -1,15 +1,10 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
-	"log"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/jackc/pgerrcode"
-	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type APIError struct {
@@ -55,51 +50,3 @@ var (
 	// Role Errors
 	ErrRoleNotAllowed = NewAPIError(http.StatusForbidden, "role not allowed")
 )
-
-func FailResponse(ctx *gin.Context, err *APIError, internalMsg error) {
-	if internalMsg != nil {
-		log.Printf(
-			"Internal Error: %v | Path: %s | Method: %s\n",
-			internalMsg, ctx.Request.URL.Path, ctx.Request.Method,
-		)
-	}
-
-	ctx.JSON(err.Code, gin.H{
-		"code":    err.Code,
-		"message": err.Message,
-	})
-}
-
-func FailAndAbortResponse(ctx *gin.Context, err *APIError, internalMsg error) {
-	if internalMsg != nil {
-		log.Printf(
-			"Internal Error: %v | Path: %s | Method: %s\n",
-			internalMsg, ctx.Request.URL.Path, ctx.Request.Method,
-		)
-	}
-
-	ctx.AbortWithStatusJSON(err.Code, gin.H{
-		"code":    err.Code,
-		"message": err.Message,
-	})
-}
-
-// Validate Foreign Key Constraint Violation
-func ValidateFKey(c *gin.Context, err error, columnName string) bool {
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.ForeignKeyViolation {
-		FailResponse(c, ErrForeignKeyViolation(columnName), err)
-		return false
-	}
-	return true
-}
-
-// Validate Unique Constraint Violation
-func ValidateUniqueness(c *gin.Context, err error, columnName string) bool {
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
-		FailResponse(c, ErrUniqueViolation(columnName), err)
-		return false
-	}
-	return true
-}
