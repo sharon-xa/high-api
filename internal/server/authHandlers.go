@@ -46,45 +46,36 @@ func (s *Server) register(c *gin.Context) {
 		Role:     role,
 	}
 
-	tx := s.db.Begin()
-	defer tx.Rollback()
-	if err := tx.Error; err != nil {
-		utils.Fail(c, utils.ErrInternal, err)
-		return
-	}
-
-	err = tx.Create(&u).Error
-	if err != nil {
-		if !utils.ValidateUniqueness(c, err, "user") {
-			return
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&u).Error; err != nil {
+			if !utils.ValidateUniqueness(c, err, "user") {
+				return err
+			}
+			utils.Fail(c, utils.ErrInternal, tx.Error)
+			return err
 		}
-		utils.Fail(c, utils.ErrInternal, tx.Error)
-		return
-	}
 
-	otp := utils.GenerateRandomOTP()
-	expTime := time.Now().Add(time.Minute * time.Duration(s.env.OtpExpMin))
-	a := database.AccountVerificationOTP{
-		UserID:    u.ID,
-		OTP:       otp,
-		ExpiresAt: expTime,
-	}
+		otp := utils.GenerateRandomOTP()
+		expTime := time.Now().Add(time.Minute * time.Duration(s.env.OtpExpMin))
+		a := database.AccountVerificationOTP{
+			UserID:    u.ID,
+			OTP:       otp,
+			ExpiresAt: expTime,
+		}
 
-	err = tx.Create(&a).Error
+		if err := tx.Create(&a).Error; err != nil {
+			utils.Fail(c, utils.ErrInternal, err)
+			return err
+		}
+
+		err = auth.SendVerificationEmail(u.Email, otp, s.env)
+		if err != nil {
+			utils.Fail(c, utils.ErrInternal, err)
+			return err
+		}
+		return nil
+	})
 	if err != nil {
-		utils.Fail(c, utils.ErrInternal, err)
-		return
-	}
-
-	err = auth.SendVerificationEmail(u.Email, otp, s.env)
-	if err != nil {
-		utils.Fail(c, utils.ErrInternal, err)
-		return
-	}
-
-	err = tx.Commit().Error
-	if err != nil {
-		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
 
@@ -138,9 +129,11 @@ func (s *Server) verifyEmail(c *gin.Context) {
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		u.Verified = true
 		if err := tx.Save(&u).Error; err != nil {
+			utils.Fail(c, utils.ErrInternal, err)
 			return err
 		}
 		if err := tx.Delete(&otp).Error; err != nil {
+			utils.Fail(c, utils.ErrInternal, err)
 			return err
 		}
 		return nil
