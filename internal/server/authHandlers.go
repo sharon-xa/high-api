@@ -92,8 +92,63 @@ func (s *Server) register(c *gin.Context) {
 }
 
 type verifyEmailReq struct {
-	OTP string `json:"otp" binding:"required"`
+	OTP   string `json:"otp"   binding:"required"`
+	Email string `json:"email" binding:"required"`
 }
 
 func (s *Server) verifyEmail(c *gin.Context) {
+	var req verifyEmailReq
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		utils.Fail(c, utils.ErrBadRequest, err)
+		return
+	}
+
+	u := database.User{}
+	if err = s.db.Where("email = ?", req.Email).First(&u).Error; err != nil {
+		utils.Fail(c, utils.ErrUnauthorized, err)
+		return
+	}
+
+	if u.Verified {
+		utils.Success(c, "your account has already been verified", nil)
+		return
+	}
+
+	otp := database.AccountVerificationOTP{}
+	if err := s.db.Where("user_id = ?", u.ID).First(&otp).Error; err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	if time.Now().After(otp.ExpiresAt) {
+		utils.Fail(c, utils.NewAPIError(http.StatusUnauthorized, "OTP is expired"), nil)
+		return
+	}
+
+	if otp.OTP != req.OTP {
+		utils.Fail(
+			c,
+			&utils.APIError{Code: http.StatusBadRequest, Message: "wrong OTP, please try again"},
+			nil,
+		)
+		return
+	}
+
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		u.Verified = true
+		if err := tx.Save(&u).Error; err != nil {
+			return err
+		}
+		if err := tx.Delete(&otp).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	utils.Success(c, "account verified successfully", nil)
 }
