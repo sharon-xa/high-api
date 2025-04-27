@@ -17,7 +17,6 @@ type Env struct {
 	// Email
 	Email    string `mapstructure:"EMAIL"`
 	Password string `mapstructure:"PASSWORD"`
-	AppUrl   string `mapstructure:"APP_URL"`
 
 	// DB
 	DBHost     string `mapstructure:"DB_HOST"`
