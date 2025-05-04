@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/gin-gonic/gin"
 	conf "github.com/sharon-xa/high-api/internal/config"
 )
 
@@ -46,7 +47,7 @@ func NewS3Storage(env *conf.Env) (*S3Storage, error) {
 
 // UploadImage uploads a multipart file to the S3 bucket
 func (s *S3Storage) UploadImage(
-	ctx *context.Context,
+	ctx *gin.Context,
 	file multipart.File,
 	fileHeader *multipart.FileHeader,
 ) (string, error) {
@@ -59,12 +60,11 @@ func (s *S3Storage) UploadImage(
 	fileExt := filepath.Ext(fileHeader.Filename)
 	objectKey := fmt.Sprintf("images/%d%s", time.Now().UnixNano(), fileExt)
 
-	_, err = s.client.PutObject(*ctx, &s3.PutObjectInput{
+	_, err = s.client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(s.bucketName),
 		Key:         aws.String(objectKey),
 		Body:        bytes.NewReader(buffer.Bytes()),
 		ContentType: aws.String(fileHeader.Header.Get("Content-Type")),
-		ACL:         "public-read", // Optional: makes file public
 	})
 	if err != nil {
 		return "", err
@@ -75,7 +75,7 @@ func (s *S3Storage) UploadImage(
 }
 
 // DeleteImageByURL removes a file from the S3 bucket using the full S3 URL
-func (s *S3Storage) DeleteImageByURL(ctx context.Context, fileURL string) error {
+func (s *S3Storage) DeleteImageByURL(ctx *gin.Context, fileURL string) error {
 	prefix := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/", s.bucketName, s.region)
 	if !strings.HasPrefix(fileURL, prefix) {
 		return fmt.Errorf("invalid S3 URL: %s", fileURL)
