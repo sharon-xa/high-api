@@ -35,7 +35,7 @@ func (s *Server) registerPublicRoutes(e *gin.Engine) {
 
 	posts := e.Group("/posts")
 	posts.GET("")
-	posts.GET("/:id")
+	posts.GET("/:id", s.getPost)
 	posts.GET("/:id/comments")
 
 	categories := e.Group("/categories")
@@ -55,7 +55,7 @@ func (s *Server) registerUserRoutes(e *gin.Engine) {
 	users.DELETE("/:id")
 
 	posts := e.Group("/posts")
-	posts.POST("")
+	posts.POST("", s.addPost)
 	posts.PUT("/:id")
 	posts.DELETE("/:id")
 	posts.POST("/:id/comments")
