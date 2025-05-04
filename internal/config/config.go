@@ -27,6 +27,12 @@ type Env struct {
 	DBSchema   string `mapstructure:"DB_SCHEMA"`
 	DBTimeZone string `mapstructure:"DB_TIMEZONE"`
 	DSN        string
+
+	// S3
+	S3AccessKey       string `mapstructure:"S3_ACCESS_KEY_ID"`
+	S3SecretAccessKey string `mapstructure:"S3_SECRET_ACCESS_KEY"`
+	S3Region          string `mapstructure:"S3_REGION"`
+	S3Bucket          string `mapstructure:"S3_BUCKET"`
 }
 
 func NewEnv() *Env {
