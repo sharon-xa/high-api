@@ -13,6 +13,7 @@ type Env struct {
 	Port        int    `mapstructure:"PORT"`
 	AdminEmail  string `mapstructure:"ADMIN_EMAIL"`
 	OtpExpMin   int    `mapstructure:"OTP_EXP_IN_MIN"`
+	ApiDomain   string `mapstructure:"API_DOMAIN"`
 
 	// Email
 	Email    string `mapstructure:"EMAIL"`
@@ -33,6 +34,16 @@ type Env struct {
 	S3SecretAccessKey string `mapstructure:"S3_SECRET_ACCESS_KEY"`
 	S3Region          string `mapstructure:"S3_REGION"`
 	S3Bucket          string `mapstructure:"S3_BUCKET"`
+
+	// JWT
+	Secret                string `mapstructure:"TOKEN_SECRET"`
+	AccessTokenSecret     string `mapstructure:"ACCESS_TOKEN_SECRET"`
+	RefreshTokenSecret    string `mapstructure:"REFRESH_TOKEN_SECRET"`
+	AccessTokenExpInMin   int    `mapstructure:"ACCESS_TOKEN_EXP_IN_MIN"`
+	RefreshTokenExpInDays int    `mapstructure:"REFRESH_TOKEN_EXP_IN_DAYS"`
+
+	// Hash
+	HashSecret string `mapstructure:"HASHING_SECRET"`
 }
 
 func NewEnv() *Env {

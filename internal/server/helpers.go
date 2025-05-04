@@ -7,10 +7,11 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sharon-xa/high-api/internal/config"
 	"github.com/sharon-xa/high-api/internal/utils"
 )
 
-func convParamToInt(c *gin.Context, param string) int32 {
+func convParamToInt(c *gin.Context, param string) uint {
 	paramStr := c.Param(param)
 	paramInt, err := strconv.Atoi(paramStr)
 	if err != nil || paramInt <= 0 {
@@ -18,18 +19,7 @@ func convParamToInt(c *gin.Context, param string) int32 {
 		return 0
 	}
 
-	return int32(paramInt)
-}
-
-// this func asumes that the string isn't ""
-func convStrToInt32(c *gin.Context, str string) int32 {
-	convertedInt, err := strconv.Atoi(str)
-	if err != nil {
-		utils.Fail(c, utils.ErrInternal, err)
-		return 0
-	}
-
-	return int32(convertedInt)
+	return uint(paramInt)
 }
 
 func convStrToUInt(c *gin.Context, numAsStr string, fieldName string) uint {
@@ -88,4 +78,21 @@ func getRequiredFormFieldUInt(c *gin.Context, formFieldName string) uint {
 	}
 
 	return fieldInt
+}
+
+func setCookie(c *gin.Context, cookieName, cookieVal string, expTimeInSec int, env *config.Env) {
+	var secure bool = true
+	if env.Environment == "dev" {
+		secure = false
+	}
+
+	c.SetCookie(
+		cookieName,
+		cookieVal,
+		expTimeInSec,
+		"/",
+		env.ApiDomain,
+		secure,
+		true,
+	)
 }
