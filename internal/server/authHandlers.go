@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/refine-software/high-api/internal/auth"
-	"github.com/refine-software/high-api/internal/database"
-	"github.com/refine-software/high-api/internal/utils"
+	"github.com/sharon-xa/high-api/internal/auth"
+	"github.com/sharon-xa/high-api/internal/database"
+	"github.com/sharon-xa/high-api/internal/utils"
 	"gorm.io/gorm"
 )
 

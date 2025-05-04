@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/refine-software/high-api/internal/config"
+	"github.com/sharon-xa/high-api/internal/config"
 	"gopkg.in/gomail.v2"
 )
 
