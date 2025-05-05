@@ -55,7 +55,7 @@ type Post struct {
 	Content    string
 	Image      string
 
-	User     User
+	User     User `gorm:"constraint:OnDelete:CASCADE;"`
 	Category Category
 	Tags     []Tag `gorm:"many2many:post_tags;"`
 	Comments []Comment
