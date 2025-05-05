@@ -31,7 +31,7 @@ func (s *Server) registerPublicRoutes(e *gin.Engine) {
 	// create account
 	auth.POST("/register", s.register)
 	auth.POST("/verify-email", s.verifyEmail)
-	auth.POST("/resend-verification-otp")
+	auth.POST("/resend-verification-otp", s.resendVerificationEmail)
 
 	// login - logout
 	auth.POST("/login", s.login)

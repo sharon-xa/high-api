@@ -141,11 +141,78 @@ func (s *Server) verifyEmail(c *gin.Context) {
 		return nil
 	})
 	if err != nil {
-		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
 
 	utils.Success(c, "account verified successfully", nil)
+}
+
+type resendVerificationReq struct {
+	Email string `json:"email" binding:"required"`
+}
+
+func (s *Server) resendVerificationEmail(c *gin.Context) {
+	var req resendVerificationReq
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		utils.Fail(c, utils.ErrBadRequest, err)
+		return
+	}
+
+	var user database.User
+	err = s.db.Select("id", "Verified").Where("email = ?", req.Email).First(&user).Error
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+	verified, userId := user.Verified, user.ID
+
+	if verified {
+		utils.Success(c, "account already verified", nil)
+		return
+	}
+
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		a := database.AccountVerificationOTP{}
+
+		err := s.db.Where("user_id = ?", userId).First(&a).Error
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Fail(c, utils.ErrInternal, err)
+			return err
+		}
+
+		otp := utils.GenerateRandomOTP()
+		expTime := time.Now().Add(time.Minute * time.Duration(s.env.OtpExpMin))
+		a.OTP = otp
+		a.ExpiresAt = expTime
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			a.UserID = userId
+
+			if err := tx.Create(&a).Error; err != nil {
+				utils.Fail(c, utils.ErrInternal, err)
+				return err
+			}
+		} else {
+			err := s.db.Save(&a).Error
+			if err != nil {
+				utils.Fail(c, utils.ErrInternal, err)
+				return err
+			}
+		}
+
+		err = auth.SendVerificationEmail(req.Email, otp, s.env)
+		if err != nil {
+			utils.Fail(c, utils.ErrInternal, err)
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return
+	}
+
+	c.JSON(http.StatusOK, userId)
 }
 
 type loginReq struct {
