@@ -3,23 +3,23 @@
 - [x] Setup your database (gorm).
 
 ## Auth
-- [ ] Middleware:
-  - [ ] CORS.
-  - [ ] User Middleware.
-  - [ ] Admin Middleware.
-- [ ] Hashing:
-  - [ ] Hashing tokens.
-  - [ ] Hashing password.
+- [x] Middleware:
+  - [x] CORS.
+  - [x] User Middleware.
+  - [x] Admin Middleware.
+- [x] Hashing:
+  - [x] Hashing tokens.
+  - [x] Hashing password.
 - [ ] User sessions:
-  - [ ] Login.
-  - [ ] Logout.
+  - [x] Login.
+  - [x] Logout.
   - [ ] Logout from all sessions.
-- [ ] Regisration:
-  - [ ] Register.
-  - [ ] Verify via otp.
-  - [ ] Resend otp.
+- [x] Regisration:
+  - [x] Register.
+  - [x] Verify via otp.
+  - [x] Resend otp.
 - [ ] Password management:
-  - [ ] Forgot password.
+  - [x] Forgot password.
   - [ ] Reset password.
 - [ ] Claims:
   - [ ] Generate claims.
