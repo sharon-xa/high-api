@@ -9,15 +9,15 @@ import (
 	"github.com/sharon-xa/high-api/internal/utils"
 )
 
-// func GenerateToken(tokenSecret string, expInMin int) (string, error) {
-// 	claims := jwt.RegisteredClaims{
-// 		ExpiresAt: jwt.NewNumericDate(
-// 			time.Now().Add(time.Minute * time.Duration(expInMin)),
-// 		),
-// 	}
-// 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-// 	return token.SignedString([]byte(tokenSecret))
-// }
+func GenerateToken(tokenSecret string, expInMin int) (string, error) {
+	claims := jwt.RegisteredClaims{
+		ExpiresAt: jwt.NewNumericDate(
+			time.Now().Add(time.Minute * time.Duration(expInMin)),
+		),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(tokenSecret))
+}
 
 func GenerateAccessToken(userId, userRole, accessTokenSecret string, expInMin int) (string, error) {
 	expirationTime := time.Now().Add((time.Minute * time.Duration(expInMin)))

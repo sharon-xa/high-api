@@ -411,3 +411,99 @@ func (s *Server) logout(c *gin.Context) {
 
 	utils.Success(c, "session revoked successfully", nil)
 }
+
+type forgotPasswordReq struct {
+	Email string `json:"email" binding:"required"`
+}
+
+func (s *Server) forgotPassword(c *gin.Context) {
+	var req forgotPasswordReq
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		utils.Fail(c, utils.ErrBadRequest, err)
+		return
+	}
+
+	var user database.User
+	err = s.db.Select("id", "Verified").Where("email = ?", req.Email).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Success(
+				c,
+				"If an account with that email exists, a password reset link has been sent.",
+				nil,
+			)
+			return
+		}
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	userId, verified := user.ID, user.Verified
+
+	if !verified {
+		utils.Success(
+			c,
+			"If an account with that email exists, a password reset link has been sent.",
+			nil,
+		)
+		return
+	}
+
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		p := database.PasswordResetToken{}
+
+		err := s.db.Where("user_id = ?", userId).First(&p).Error
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Fail(c, utils.ErrInternal, err)
+			return err
+		}
+
+		token, err := auth.GenerateToken(s.env.TokenSecret, s.env.PasswordResetExpInMin)
+		if err != nil {
+			utils.Fail(c, utils.ErrInternal, err)
+			return err
+		}
+		expTime := time.Now().Add(time.Minute * time.Duration(s.env.PasswordResetExpInMin))
+		p.ExpiresAt = expTime
+
+		hashedToken, err := utils.HashToken(token, s.env.HashSecret)
+		if err != nil {
+			utils.Fail(c, utils.ErrInternal, err)
+			return err
+		}
+		p.Token = hashedToken
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			p.UserID = userId
+
+			if err := tx.Create(&p).Error; err != nil {
+				utils.Fail(c, utils.ErrInternal, err)
+				return err
+			}
+		} else {
+			err := s.db.Save(&p).Error
+			if err != nil {
+				utils.Fail(c, utils.ErrInternal, err)
+				return err
+			}
+		}
+
+		err = auth.SendResetPasswordEmail(req.Email, token, s.env)
+		if err != nil {
+			utils.Fail(c, utils.ErrInternal, err)
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return
+	}
+
+	utils.Success(
+		c,
+		"If an account with that email exists, a password reset link has been sent.",
+		nil,
+	)
+}

@@ -37,7 +37,7 @@ func (s *Server) registerPublicRoutes(e *gin.Engine) {
 	auth.POST("/login", s.login)
 
 	// password reset
-	auth.POST("/forgot-password")
+	auth.POST("/forgot-password", s.forgotPassword)
 	auth.POST("/reset-password")
 
 	// public posts

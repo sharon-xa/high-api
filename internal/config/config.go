@@ -9,15 +9,17 @@ import (
 
 type Env struct {
 	// App
-	Environment string `mapstructure:"APP_ENV"`
-	Port        int    `mapstructure:"PORT"`
-	AdminEmail  string `mapstructure:"ADMIN_EMAIL"`
-	OtpExpMin   int    `mapstructure:"OTP_EXP_IN_MIN"`
-	ApiDomain   string `mapstructure:"API_DOMAIN"`
+	Environment           string `mapstructure:"APP_ENV"`
+	Port                  int    `mapstructure:"PORT"`
+	AdminEmail            string `mapstructure:"ADMIN_EMAIL"`
+	OtpExpMin             int    `mapstructure:"OTP_EXP_IN_MIN"`
+	PasswordResetExpInMin int    `mapstructure:"PASSWORD_RESET_EXP_IN_MIN"`
+	ApiDomain             string `mapstructure:"API_DOMAIN"`
 
 	// Email
-	Email    string `mapstructure:"EMAIL"`
-	Password string `mapstructure:"PASSWORD"`
+	Email       string `mapstructure:"EMAIL"`
+	Password    string `mapstructure:"PASSWORD"`
+	FrontendUrl string `mapstructure:"FRONTEND_PASS_RESET_URL"`
 
 	// DB
 	DBHost     string `mapstructure:"DB_HOST"`
@@ -36,7 +38,7 @@ type Env struct {
 	S3Bucket          string `mapstructure:"S3_BUCKET"`
 
 	// JWT
-	Secret                string `mapstructure:"TOKEN_SECRET"`
+	TokenSecret           string `mapstructure:"TOKEN_SECRET"`
 	AccessTokenSecret     string `mapstructure:"ACCESS_TOKEN_SECRET"`
 	RefreshTokenSecret    string `mapstructure:"REFRESH_TOKEN_SECRET"`
 	AccessTokenExpInMin   int    `mapstructure:"ACCESS_TOKEN_EXP_IN_MIN"`
