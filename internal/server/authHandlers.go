@@ -319,3 +319,28 @@ func (s *Server) login(c *gin.Context) {
 		AccessToken: accessToken,
 	})
 }
+
+func (s *Server) logout(c *gin.Context) {
+	deviceId := getHeader(c, "Device-ID")
+	if deviceId == "" {
+		return
+	}
+
+	var refreshToken database.RefreshToken
+
+	err := s.db.Where("device_id = ?", deviceId).First(&refreshToken).Error
+	if err != nil {
+		// Check if the refresh token doesn't exists
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	refreshToken.Revoked = true
+	err = s.db.Save(&refreshToken).Error
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	utils.Success(c, "session revoked successfully", nil)
+}

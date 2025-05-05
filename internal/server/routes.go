@@ -66,7 +66,7 @@ func (s *Server) registerUserRoutes(e *gin.Engine) {
 	protected.Use(middleware.User(s.env.AccessTokenSecret))
 
 	auth := protected.Group("/auth")
-	auth.POST("/logout")
+	auth.POST("/logout", s.logout)
 	auth.POST("/logout/all")
 
 	users := protected.Group("/users")
