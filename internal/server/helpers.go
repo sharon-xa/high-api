@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sharon-xa/high-api/internal/auth"
 	"github.com/sharon-xa/high-api/internal/config"
 	"github.com/sharon-xa/high-api/internal/utils"
 )
@@ -95,4 +96,19 @@ func setCookie(c *gin.Context, cookieName, cookieVal string, expTimeInSec int, e
 		secure,
 		true,
 	)
+}
+
+func GetAccessClaims(c *gin.Context) *auth.AccessClaims {
+	claimsInterface, exists := c.Get("claims")
+	if !exists {
+		utils.Fail(c, utils.ErrUnauthorized, nil)
+		return nil
+	}
+
+	claims, ok := claimsInterface.(*auth.AccessClaims)
+	if !ok {
+		utils.Fail(c, utils.ErrUnauthorized, nil)
+		return nil
+	}
+	return claims
 }
