@@ -459,20 +459,14 @@ func (s *Server) forgotPassword(c *gin.Context) {
 			return err
 		}
 
-		token, err := auth.GenerateToken(s.env.TokenSecret, s.env.PasswordResetExpInMin)
-		if err != nil {
-			utils.Fail(c, utils.ErrInternal, err)
-			return err
+		token, tokenErr := auth.GenerateToken(s.env.TokenSecret, s.env.PasswordResetExpInMin)
+		if tokenErr != nil {
+			utils.Fail(c, utils.ErrInternal, tokenErr)
+			return tokenErr
 		}
 		expTime := time.Now().Add(time.Minute * time.Duration(s.env.PasswordResetExpInMin))
 		p.ExpiresAt = expTime
-
-		hashedToken, err := utils.HashToken(token, s.env.HashSecret)
-		if err != nil {
-			utils.Fail(c, utils.ErrInternal, err)
-			return err
-		}
-		p.Token = hashedToken
+		p.Token = token
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			p.UserID = userId
