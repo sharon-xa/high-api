@@ -375,7 +375,7 @@ func (s *Server) login(c *gin.Context) {
 	tokenExp := 60 * 60 * 24 * s.env.RefreshTokenExpInDays
 	setCookie(
 		c,
-		"refresh_token",
+		"refreshToken",
 		refreshToken,
 		tokenExp,
 		s.env,
@@ -410,6 +410,131 @@ func (s *Server) logout(c *gin.Context) {
 	}
 
 	utils.Success(c, "session revoked successfully", nil)
+}
+
+type RefreshRes struct {
+	AccessToken string `json:"accessToken"`
+	Role        string `json:"role"`
+}
+
+func (s *Server) refreshTokens(c *gin.Context) {
+	refreshCookie, err := c.Cookie("refreshToken")
+	if err != nil {
+		utils.Fail(c, utils.ErrBadRequest, err)
+		return
+	}
+
+	deviceId := getHeader(c, "Device-ID")
+	if deviceId == "" {
+		return
+	}
+
+	r := database.RefreshToken{}
+	err = s.db.Where("device_id = ?", deviceId).First(&r).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Fail(
+				c,
+				&utils.APIError{Code: http.StatusUnauthorized, Message: "you're not logged in"},
+				err,
+			)
+			return
+		}
+
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	if !utils.VerifyToken(r.RefreshToken, refreshCookie, s.env.RefreshTokenSecret) {
+		utils.Fail(c, utils.ErrStolenToken, errors.New("refresh token might be stolen"))
+		return
+	}
+
+	if r.Revoked {
+		utils.Fail(
+			c,
+			&utils.APIError{
+				Code:    http.StatusUnauthorized,
+				Message: "your session has been expired, please login again",
+			},
+			nil,
+		)
+		return
+	}
+
+	if time.Now().After(r.ExpiresAt) {
+		utils.Fail(
+			c,
+			&utils.APIError{
+				Code:    http.StatusUnauthorized,
+				Message: "your session has been expired, please login again",
+			},
+			nil,
+		)
+		return
+	}
+
+	if deviceId != r.DeviceID {
+		utils.Fail(c, utils.ErrStolenToken, errors.New("refresh token might be stolen"))
+		return
+	}
+
+	u := database.User{}
+	err = s.db.Select("id", "role").First(&u).Error
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+	userId, role := u.ID, u.Role
+
+	newRefreshToken, err := auth.GenerateRefreshToken(
+		strconv.Itoa(int(userId)),
+		s.env.RefreshTokenSecret,
+		s.env.RefreshTokenExpInDays,
+	)
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	newRefreshTokenHashed, err := utils.HashToken(newRefreshToken, s.env.HashSecret)
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	accessToken, err := auth.GenerateAccessToken(
+		strconv.Itoa(int(userId)),
+		string(role),
+		s.env.AccessTokenSecret,
+		s.env.AccessTokenExpInMin,
+	)
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	r.RefreshToken = newRefreshTokenHashed
+	r.ExpiresAt = time.Now().Add((time.Hour * 24) * time.Duration(s.env.RefreshTokenExpInDays))
+
+	err = s.db.Save(&r).Error
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	setCookie(
+		c,
+		"refreshToken",
+		newRefreshToken,
+		60*60*24*s.env.RefreshTokenExpInDays,
+		s.env,
+	)
+
+	c.JSON(http.StatusOK, RefreshRes{
+		AccessToken: accessToken,
+		Role:        role,
+	})
 }
 
 type forgotPasswordReq struct {
