@@ -422,6 +422,18 @@ func (s *Server) logout(c *gin.Context) {
 	utils.Success(c, "session revoked successfully", nil)
 }
 
+func (s *Server) logoutAllSessions(c *gin.Context) {
+	claims := GetAccessClaims(c)
+
+	err := s.db.Where("user_id = ?", claims.Subject).Delete(&database.RefreshToken{}).Error
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	utils.Success(c, "all sessions logged out", nil)
+}
+
 type RefreshRes struct {
 	AccessToken string `json:"accessToken"`
 	Role        string `json:"role"`
