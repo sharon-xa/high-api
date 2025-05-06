@@ -507,7 +507,7 @@ func (s *Server) refreshTokens(c *gin.Context) {
 		return
 	}
 
-	newRefreshTokenHashed, err := utils.HashToken(newRefreshToken, s.env.HashSecret)
+	newRefreshTokenHashed, err := utils.HashToken(newRefreshToken, s.env.RefreshTokenSecret)
 	if err != nil {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
