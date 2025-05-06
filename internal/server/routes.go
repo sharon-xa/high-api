@@ -33,12 +33,13 @@ func (s *Server) registerPublicRoutes(e *gin.Engine) {
 	auth.POST("/verify-email", s.verifyEmail)
 	auth.POST("/resend-verification-otp", s.resendVerificationEmail)
 
-	// login - logout
+	// login - refresh
 	auth.POST("/login", s.login)
+	auth.POST("/refresh-tokens")
 
 	// password reset
 	auth.POST("/forgot-password", s.forgotPassword)
-	auth.POST("/reset-password")
+	auth.POST("/reset-password", s.resetPassword)
 
 	// public posts
 	posts := e.Group("/posts")
@@ -61,7 +62,6 @@ func (s *Server) registerPublicRoutes(e *gin.Engine) {
 }
 
 func (s *Server) registerUserRoutes(e *gin.Engine) {
-	// logout
 	protected := e.Group("")
 	protected.Use(middleware.User(s.env.AccessTokenSecret))
 

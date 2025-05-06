@@ -501,3 +501,70 @@ func (s *Server) forgotPassword(c *gin.Context) {
 		nil,
 	)
 }
+
+type resetPasswordReq struct {
+	ResetToken  string `json:"resetToken"  binding:"required"`
+	NewPassword string `json:"newPassword" binding:"required"`
+}
+
+func (s *Server) resetPassword(c *gin.Context) {
+	var req resetPasswordReq
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		utils.Fail(c, utils.ErrBadRequest, err)
+		return
+	}
+
+	p := database.PasswordResetToken{}
+
+	err = s.db.Where("token = ?", req.ResetToken).First(&p).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Fail(c, &utils.APIError{
+				Code:    http.StatusBadRequest,
+				Message: "no such token",
+			}, err)
+			return
+		}
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	if time.Now().After(p.ExpiresAt) {
+		utils.Fail(
+			c,
+			&utils.APIError{Code: http.StatusBadRequest, Message: "token has expired"},
+			nil,
+		)
+		return
+	}
+
+	hashedPassword, err := utils.HashPassword(req.NewPassword)
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		err := tx.Model(&database.User{}).
+			Where("id = ?", p.UserID).
+			Update("password", hashedPassword).Error
+		if err != nil {
+			utils.Fail(c, utils.ErrInternal, err)
+			return err
+		}
+
+		err = tx.Delete(&p).Error
+		if err != nil {
+			utils.Fail(c, utils.ErrInternal, err)
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return
+	}
+
+	utils.Success(c, "password updated successfully", nil)
+}
