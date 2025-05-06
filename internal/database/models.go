@@ -38,13 +38,15 @@ type PasswordResetToken struct {
 }
 
 type RefreshToken struct {
-	gorm.Model
+	ID           uint      `gorm:"primaryKey"`
 	UserID       uint      `gorm:"index;not null"`
 	User         User      `gorm:"constraint:OnDelete:CASCADE;"`
 	RefreshToken string    `gorm:"not null"`
 	ExpiresAt    time.Time `gorm:"not null"`
 	Revoked      bool      `gorm:"default:false"`
 	DeviceID     string    `gorm:"not null;unique"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 type Post struct {
