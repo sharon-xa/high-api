@@ -10,17 +10,17 @@
 - [x] Hashing:
   - [x] Hashing tokens.
   - [x] Hashing password.
-- [ ] User sessions:
+- [x] User sessions:
   - [x] Login.
   - [x] Logout.
-  - [ ] Logout from all sessions.
+  - [x] Logout from all sessions.
 - [x] Regisration:
   - [x] Register.
   - [x] Verify via otp.
   - [x] Resend otp.
-- [ ] Password management:
+- [x] Password management:
   - [x] Forgot password.
-  - [ ] Reset password.
-- [ ] Claims:
-  - [ ] Generate claims.
-  - [ ] Parse claims.
+  - [x] Reset password.
+- [x] Claims:
+  - [x] Generate claims.
+  - [x] Parse claims.
