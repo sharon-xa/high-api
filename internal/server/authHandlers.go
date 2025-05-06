@@ -397,7 +397,17 @@ func (s *Server) logout(c *gin.Context) {
 
 	err := s.db.Where("device_id = ?", deviceId).First(&refreshToken).Error
 	if err != nil {
-		// Check if the refresh token doesn't exists
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Fail(
+				c,
+				&utils.APIError{
+					Code:    http.StatusBadRequest,
+					Message: "refresh token not found for this device.",
+				},
+				err,
+			)
+			return
+		}
 		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
