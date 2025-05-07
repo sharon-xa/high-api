@@ -57,8 +57,7 @@ func (s *Server) registerPublicRoutes(e *gin.Engine) {
 
 	// public tags
 	tags := e.Group("/tags")
-	tags.GET("")
-	tags.GET("/:name") // Retrieve all posts associated with a specific tag.
+	tags.GET("", s.getAllTags)
 }
 
 func (s *Server) registerUserRoutes(e *gin.Engine) {
