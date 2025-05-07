@@ -69,8 +69,10 @@ func (s *Server) registerUserRoutes(e *gin.Engine) {
 	auth.POST("/logout/all", s.logoutAllSessions)
 
 	users := protected.Group("/users")
-	users.PUT("/:id")
-	users.DELETE("/:id")
+	users.GET("/me", s.getUser)
+	users.PUT("/me", s.updateUser)
+	users.PATCH("/me/image", s.updateUserImage)
+	users.DELETE("/me", s.deleteUser)
 
 	posts := protected.Group("/posts")
 	posts.POST("", s.addPost)
@@ -87,9 +89,9 @@ func (s *Server) registerAdminRoutes(e *gin.Engine) {
 	admin := e.Group("/admin")
 	admin.Use(middleware.Admin(s.env.AccessTokenSecret))
 
-	admin.GET("/users")               // retrieve all users
-	admin.POST("/users/{id}/ban")     // ban a user
-	admin.POST("/users/{id}/promote") // promote a user to admin
+	admin.GET("/users")
+	admin.POST("/users/{id}/ban")
+	admin.POST("/users/{id}/promote")
 
 	admin.DELETE("/posts/:id")
 
