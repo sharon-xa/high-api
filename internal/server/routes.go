@@ -98,9 +98,9 @@ func (s *Server) registerAdminRoutes(e *gin.Engine) {
 	admin.GET("/comments")
 	admin.DELETE("/comments/:id")
 
-	admin.POST("/category")
-	admin.PUT("/category/:id")
-	admin.DELETE("/category/:id")
+	admin.POST("/category", s.addCategory)
+	admin.PUT("/category/:id", s.updateCategory)
+	admin.DELETE("/category/:id", s.deleteCategory)
 
 	admin.PUT("/tags/:id")
 	admin.DELETE("/tags/:id")
