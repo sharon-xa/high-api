@@ -49,7 +49,7 @@ func (s *Server) registerPublicRoutes(e *gin.Engine) {
 
 	// public categories
 	categories := e.Group("/categories")
-	categories.GET("")
+	categories.GET("", s.getCategories)
 
 	// public users
 	users := e.Group("/users")

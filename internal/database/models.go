@@ -85,8 +85,8 @@ type PostTag struct {
 }
 
 type Category struct {
-	ID   uint   `gorm:"primaryKey"`
-	Name string `gorm:"unique"`
+	ID   uint   `gorm:"primaryKey" json:"id"`
+	Name string `gorm:"unique"     json:"name"`
 
-	Posts []Post
+	Posts []Post `json:"-"`
 }
