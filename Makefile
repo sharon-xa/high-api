@@ -38,6 +38,12 @@ docker-dev-down:
 	@echo "Stopping development containers..."
 	docker compose -f docker-compose.dev.yml down
 
+migrate-up:
+	./scripts/migrate.sh up
+
+migrate-down:
+	./scripts/migrate.sh down
+
 # Test the application
 test:
 	@echo "Testing..."
