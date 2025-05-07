@@ -112,3 +112,22 @@ func getAccessClaims(c *gin.Context) *auth.AccessClaims {
 	}
 	return claims
 }
+
+func capitalizeString(s string) string {
+	if s == "" {
+		return ""
+	}
+	var capitalizedWords []string
+	words := strings.SplitSeq(s, " ")
+	for word := range words {
+		capitalizedWord := strings.Replace(
+			word,
+			string(word[0]),
+			strings.ToUpper(string(word[0])),
+			1,
+		)
+		capitalizedWords = append(capitalizedWords, capitalizedWord)
+	}
+
+	return strings.Join(capitalizedWords, " ")
+}
