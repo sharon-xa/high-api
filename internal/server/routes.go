@@ -53,7 +53,7 @@ func (s *Server) registerPublicRoutes(e *gin.Engine) {
 
 	// public users
 	users := e.Group("/users")
-	users.GET("/:id")
+	users.GET("/:id/public", s.getUserPublic)
 
 	// public tags
 	tags := e.Group("/tags")
