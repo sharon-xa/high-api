@@ -74,9 +74,9 @@ type Comment struct {
 }
 
 type Tag struct {
-	ID    uint   `gorm:"primaryKey"`
-	Name  string `gorm:"unique"`
-	Posts []Post `gorm:"many2many:post_tags;"`
+	ID    uint   `gorm:"primaryKey"           json:"id"`
+	Name  string `gorm:"unique"               json:"name"`
+	Posts []Post `gorm:"many2many:post_tags;" json:"-"`
 }
 
 type PostTag struct {
