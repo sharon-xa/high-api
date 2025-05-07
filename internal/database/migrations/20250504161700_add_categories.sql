@@ -1,26 +1,31 @@
 -- +goose Up
 INSERT INTO categories (name) VALUES
-    ('Technology'),
-    ('Science'),
-    ('Health'),
-    ('Travel'),
-    ('Food'),
-    ('Education'),
-    ('Business'),
-    ('Lifestyle'),
-    ('Entertainment'),
-    ('Sports');
+('Programming'),
+('Software Architecture'),
+('Tools & Workflows'),
+('Databases'),
+('Productivity'),
+('Security'),
+('Testing & Debugging'),
+('Career & Growth'),
+('Operating Systems'),
+('Infrastructure & Cloud'),
+('Web & Internet'),
+('Open Source');
 
 -- +goose Down
-DELETE FROM categories WHERE name IN (
-    'Technology',
-    'Science',
-    'Health',
-    'Travel',
-    'Food',
-    'Education',
-    'Business',
-    'Lifestyle',
-    'Entertainment',
-    'Sports'
+DELETE FROM categories
+WHERE name IN (
+    'Programming',
+    'Software Architecture',
+    'Tools & Workflows',
+    'Databases',
+    'Productivity',
+    'Security',
+    'Testing & Debugging',
+    'Career & Growth',
+    'Operating Systems',
+    'Infrastructure & Cloud',
+    'Web & Internet',
+    'Open Source'
 );
