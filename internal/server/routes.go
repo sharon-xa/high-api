@@ -45,7 +45,7 @@ func (s *Server) registerPublicRoutes(e *gin.Engine) {
 	posts := e.Group("/posts")
 	posts.GET("")
 	posts.GET("/:id", s.getPost)
-	posts.GET("/:id/comments")
+	posts.GET("/:id/comments", s.getCommentsOfPost)
 
 	// public categories
 	categories := e.Group("/categories")

@@ -75,6 +75,60 @@ func (s *Server) getPost(c *gin.Context) {
 	})
 }
 
+type commentResponse struct {
+	ID        uint              `json:"id"`
+	Content   string            `json:"content"`
+	CreatedAt time.Time         `json:"created_at"`
+	User      publicUserSummary `json:"user"`
+}
+
+type publicUserSummary struct {
+	ID    uint   `json:"id"`
+	Name  string `json:"name"`
+	Image string `json:"image"`
+}
+
+func (s *Server) getCommentsOfPost(c *gin.Context) {
+	postId := convParamToInt(c, "id")
+	if postId == 0 {
+		utils.Fail(c, utils.ErrBadRequest, nil)
+		return
+	}
+
+	var comments []database.Comment
+	err := s.db.Preload("User").
+		Where("post_id = ?", postId).
+		Order("created_at ASC").
+		Find(&comments).
+		Error
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	var response []commentResponse
+	for _, cm := range comments {
+		response = append(response, commentResponse{
+			ID:        cm.ID,
+			Content:   cm.Content,
+			CreatedAt: cm.CreatedAt,
+			User: publicUserSummary{
+				ID:    cm.User.ID,
+				Name:  cm.User.Name,
+				Image: cm.User.Image,
+			},
+		})
+	}
+	if len(response) == 0 {
+		c.Status(http.StatusNoContent)
+		return
+	}
+
+	// TODO: we might want to limit the number of comments returned to the user
+	// paginate the comments
+	utils.Success(c, "", response)
+}
+
 func (s *Server) addPost(c *gin.Context) {
 	userId := getRequiredFormFieldUInt(c, "userId")
 	if userId == 0 {
