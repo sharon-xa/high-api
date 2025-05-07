@@ -98,7 +98,7 @@ func setCookie(c *gin.Context, cookieName, cookieVal string, expTimeInSec int, e
 	)
 }
 
-func GetAccessClaims(c *gin.Context) *auth.AccessClaims {
+func getAccessClaims(c *gin.Context) *auth.AccessClaims {
 	claimsInterface, exists := c.Get("claims")
 	if !exists {
 		utils.Fail(c, utils.ErrUnauthorized, nil)

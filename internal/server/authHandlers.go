@@ -423,7 +423,10 @@ func (s *Server) logout(c *gin.Context) {
 }
 
 func (s *Server) logoutAllSessions(c *gin.Context) {
-	claims := GetAccessClaims(c)
+	claims := getAccessClaims(c)
+	if claims == nil {
+		return
+	}
 
 	err := s.db.Where("user_id = ?", claims.Subject).Delete(&database.RefreshToken{}).Error
 	if err != nil {
