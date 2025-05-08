@@ -16,6 +16,7 @@ type User struct {
 	Password string
 	Role     string `gorm:"default:'user'"`
 	Verified bool   `gorm:"default:false"`
+	Banned   bool   `gorm:"default:false"`
 
 	Posts                  []Post
 	Comments               []Comment

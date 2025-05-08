@@ -1,0 +1,7 @@
+-- +goose Up
+ALTER TABLE users
+ADD column IF NOT EXISTS banned BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- +goose Down
+ALTER TABLE users
+DROP COLUMN IF EXISTS banned;

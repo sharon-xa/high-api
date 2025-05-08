@@ -229,3 +229,54 @@ func (s *Server) deleteUser(c *gin.Context) {
 
 	utils.Success(c, "user is deleted successfully", nil)
 }
+
+func (s *Server) banUser(c *gin.Context) {
+	userID := convParamToInt(c, "id")
+	if userID == 0 {
+		return
+	}
+
+	var user database.User
+	if err := s.db.First(&user, userID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Fail(c, utils.ErrNotFound, err)
+			return
+		}
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	user.Banned = true
+	if err := s.db.Save(&user).Error; err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	utils.Success(c, "User banned successfully", nil)
+}
+
+func (s *Server) promoteUser(c *gin.Context) {
+	userID := convParamToInt(c, "id")
+	if userID == 0 {
+		return
+	}
+
+	var user database.User
+	if err := s.db.First(&user, userID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Fail(c, utils.ErrNotFound, err)
+			return
+		}
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	user.Role = "admin"
+
+	if err := s.db.Save(&user).Error; err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	utils.Success(c, "User promoted successfully", nil)
+}

@@ -258,6 +258,14 @@ func (s *Server) login(c *gin.Context) {
 		return
 	}
 
+	if u.Banned {
+		utils.Fail(c, &utils.APIError{
+			Code:    http.StatusForbidden,
+			Message: "Your account has been banned.",
+		}, nil)
+		return
+	}
+
 	// generate refresh and access tokens
 	deviceId := getHeader(c, "Device-ID")
 	if deviceId == "" {
@@ -505,12 +513,20 @@ func (s *Server) refreshTokens(c *gin.Context) {
 	}
 
 	u := database.User{}
-	err = s.db.Select("id", "role").First(&u).Error
+	err = s.db.Select("id", "role", "banned").First(&u).Error
 	if err != nil {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
-	userId, role := u.ID, u.Role
+	userId, role, banned := u.ID, u.Role, u.Banned
+
+	if banned {
+		utils.Fail(c, &utils.APIError{
+			Code:    http.StatusForbidden,
+			Message: "Your account has been banned.",
+		}, nil)
+		return
+	}
 
 	newRefreshToken, err := auth.GenerateRefreshToken(
 		strconv.Itoa(int(userId)),

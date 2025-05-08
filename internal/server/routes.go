@@ -90,8 +90,8 @@ func (s *Server) registerAdminRoutes(e *gin.Engine) {
 	admin.Use(middleware.Admin(s.env.AccessTokenSecret))
 
 	admin.GET("/users", s.getAllUsers)
-	admin.POST("/users/{id}/ban")
-	admin.POST("/users/{id}/promote")
+	admin.POST("/users/:id/ban", s.banUser)
+	admin.POST("/users/:id/promote", s.promoteUser)
 
 	admin.DELETE("/posts/:id")
 
