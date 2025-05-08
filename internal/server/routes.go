@@ -89,7 +89,7 @@ func (s *Server) registerAdminRoutes(e *gin.Engine) {
 	admin := e.Group("/admin")
 	admin.Use(middleware.Admin(s.env.AccessTokenSecret))
 
-	admin.GET("/users")
+	admin.GET("/users", s.getAllUsers)
 	admin.POST("/users/{id}/ban")
 	admin.POST("/users/{id}/promote")
 

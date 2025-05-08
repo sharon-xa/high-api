@@ -3,12 +3,53 @@ package server
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sharon-xa/high-api/internal/database"
 	"github.com/sharon-xa/high-api/internal/utils"
 	"gorm.io/gorm"
 )
+
+type adminUserResponse struct {
+	ID        uint      `json:"id"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Gender    string    `json:"gender"`
+	Image     string    `json:"image"`
+	Bio       string    `json:"bio"`
+	Role      string    `json:"role"`
+	Verified  bool      `json:"verified"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func (s *Server) getAllUsers(c *gin.Context) {
+	var users []database.User
+
+	err := s.db.Find(&users).Error
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	var response []adminUserResponse
+	for _, u := range users {
+		response = append(response, adminUserResponse{
+			ID:        u.ID,
+			Name:      u.Name,
+			Email:     u.Email,
+			Gender:    u.Gender,
+			Image:     u.Image,
+			Bio:       u.Bio,
+			Role:      u.Role,
+			Verified:  u.Verified,
+			CreatedAt: u.CreatedAt,
+		})
+	}
+
+	// TODO: the users needs to be paginated
+	utils.Success(c, "", response)
+}
 
 type publicUserResponse struct {
 	ID    uint   `json:"id"`
@@ -180,7 +221,7 @@ func (s *Server) deleteUser(c *gin.Context) {
 		return
 	}
 
-	err := s.db.Delete(&database.User{}, claims.Subject).Error
+	err := s.db.Unscoped().Delete(&database.User{}, claims.Subject).Error
 	if err != nil {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
