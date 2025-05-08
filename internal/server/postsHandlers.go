@@ -241,7 +241,84 @@ func (s *Server) addPost(c *gin.Context) {
 	})
 }
 
+type updatePostRequest struct {
+	Title      string `json:"title"      binding:"required"`
+	Content    string `json:"content"    binding:"required"`
+	CategoryID uint   `json:"categoryId" binding:"required"`
+	Tags       string `json:"tags"       binding:"required"`
+}
+
 func (s *Server) updatePost(c *gin.Context) {
+	var req updatePostRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.Fail(c, utils.ErrBadRequest, err)
+		return
+	}
+
+	postId := convParamToInt(c, "id")
+	if postId == 0 {
+		utils.Fail(c, utils.ErrBadRequest, errors.New("invalid post ID"))
+		return
+	}
+
+	claims := getAccessClaims(c)
+	if claims == nil {
+		return
+	}
+
+	var post database.Post
+	if err := s.db.Preload("Tags").First(&post, postId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Fail(c, utils.ErrNotFound, err)
+		} else {
+			utils.Fail(c, utils.ErrInternal, err)
+		}
+		return
+	}
+
+	userId, err := strconv.Atoi(claims.Subject)
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+	if post.UserID != uint(userId) {
+		utils.Fail(
+			c,
+			&utils.APIError{
+				Code:    http.StatusForbidden,
+				Message: "you're not allowed to delete this post",
+			},
+			nil,
+		)
+		return
+	}
+
+	post.Title = req.Title
+	post.Content = req.Content
+	post.CategoryID = req.CategoryID
+
+	rawTags := strings.Split(req.Tags, ",")
+	var tags []database.Tag
+	for _, tagName := range rawTags {
+		tagName = strings.ToLower(strings.TrimSpace(tagName))
+		if tagName == "" {
+			continue
+		}
+		var tag database.Tag
+		if err := s.db.Where("name = ?", tagName).FirstOrCreate(&tag, database.Tag{Name: tagName}).Error; err != nil {
+			utils.Fail(c, utils.ErrInternal, err)
+			return
+		}
+		tags = append(tags, tag)
+	}
+	s.db.Model(&post).Association("Tags").Replace(&tags)
+
+	if err := s.db.Save(&post).Error; err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	utils.Success(c, "Post updated successfully", nil)
 }
 
 func (s *Server) deletePost(c *gin.Context) {
