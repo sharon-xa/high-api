@@ -76,8 +76,8 @@ func (s *Server) registerUserRoutes(e *gin.Engine) {
 
 	posts := protected.Group("/posts")
 	posts.POST("", s.addPost)
-	posts.PUT("/:id")
-	posts.DELETE("/:id")
+	posts.PUT("/:id", s.updatePost)
+	posts.DELETE("/:id", s.deletePost)
 	posts.POST("/:id/comments")
 
 	comments := protected.Group("/comments")
@@ -93,7 +93,7 @@ func (s *Server) registerAdminRoutes(e *gin.Engine) {
 	admin.POST("/users/:id/ban", s.banUser)
 	admin.POST("/users/:id/promote", s.promoteUser)
 
-	admin.DELETE("/posts/:id")
+	admin.DELETE("/posts/:id", s.deletePost)
 
 	admin.GET("/comments")
 	admin.DELETE("/comments/:id")

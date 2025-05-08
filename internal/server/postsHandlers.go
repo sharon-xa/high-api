@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -238,4 +239,69 @@ func (s *Server) addPost(c *gin.Context) {
 			Name: p.Category.Name,
 		},
 	})
+}
+
+func (s *Server) updatePost(c *gin.Context) {
+}
+
+func (s *Server) deletePost(c *gin.Context) {
+	postId := convParamToInt(c, "id")
+	if postId == 0 {
+		utils.Fail(c, utils.ErrBadRequest, nil)
+		return
+	}
+
+	claims := getAccessClaims(c)
+	if claims == nil {
+		return
+	}
+
+	var p database.Post
+	err := s.db.First(&p, postId).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Fail(
+				c,
+				&utils.APIError{Code: http.StatusNotFound, Message: "post doesn't exist"},
+				err,
+			)
+			return
+		}
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
+	userId, err := strconv.Atoi(claims.Subject)
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+	if p.UserID != uint(userId) && claims.Role != "admin" {
+		utils.Fail(
+			c,
+			&utils.APIError{
+				Code:    http.StatusForbidden,
+				Message: "you're not allowed to delete this post",
+			},
+			nil,
+		)
+		return
+	}
+
+	results := s.db.Delete(&database.Post{}, p.ID)
+	if results.Error != nil {
+		utils.Fail(c, utils.ErrInternal, results.Error)
+		return
+	}
+
+	if results.RowsAffected == 0 {
+		utils.Fail(
+			c,
+			&utils.APIError{Code: http.StatusNotFound, Message: "post not found"},
+			nil,
+		)
+		return
+	}
+
+	utils.Success(c, "post deleted successfully", nil)
 }
