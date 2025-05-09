@@ -14,12 +14,12 @@ type Env struct {
 	AdminEmail            string `mapstructure:"ADMIN_EMAIL"`
 	OtpExpMin             int    `mapstructure:"OTP_EXP_IN_MIN"`
 	PasswordResetExpInMin int    `mapstructure:"PASSWORD_RESET_EXP_IN_MIN"`
-	ApiDomain             string `mapstructure:"API_DOMAIN"`
+	APIDomain             string `mapstructure:"API_DOMAIN"`
 
 	// Email
 	Email       string `mapstructure:"EMAIL"`
 	Password    string `mapstructure:"PASSWORD"`
-	FrontendUrl string `mapstructure:"FRONTEND_PASS_RESET_URL"`
+	FrontendURL string `mapstructure:"FRONTEND_PASS_RESET_URL"`
 
 	// DB
 	DBHost     string `mapstructure:"DB_HOST"`

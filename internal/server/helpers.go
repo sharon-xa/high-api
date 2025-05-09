@@ -82,7 +82,8 @@ func getRequiredFormFieldUInt(c *gin.Context, formFieldName string) uint {
 }
 
 func setCookie(c *gin.Context, cookieName, cookieVal string, expTimeInSec int, env *config.Env) {
-	var secure bool = true
+	secure := true
+
 	if env.Environment == "dev" {
 		secure = false
 	}
@@ -92,7 +93,7 @@ func setCookie(c *gin.Context, cookieName, cookieVal string, expTimeInSec int, e
 		cookieVal,
 		expTimeInSec,
 		"/",
-		env.ApiDomain,
+		env.APIDomain,
 		secure,
 		true,
 	)

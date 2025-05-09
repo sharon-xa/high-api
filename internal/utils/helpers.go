@@ -8,7 +8,7 @@ func GenerateRandomOTP() string {
 	const otpLength = 6
 	otp := make([]byte, otpLength)
 
-	for i := 0; i < otpLength; i++ {
+	for i := range otp {
 		randomByte := make([]byte, 1)
 
 		for {

@@ -19,14 +19,14 @@ func GenerateToken(tokenSecret string, expInMin int) (string, error) {
 	return token.SignedString([]byte(tokenSecret))
 }
 
-func GenerateAccessToken(userId, userRole, accessTokenSecret string, expInMin int) (string, error) {
+func GenerateAccessToken(userID, userRole, accessTokenSecret string, expInMin int) (string, error) {
 	expirationTime := time.Now().Add((time.Minute * time.Duration(expInMin)))
 
 	claims := &AccessClaims{
 		Role: userRole,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
-			Subject:   userId,
+			Subject:   userID,
 		},
 	}
 
@@ -34,11 +34,11 @@ func GenerateAccessToken(userId, userRole, accessTokenSecret string, expInMin in
 	return token.SignedString([]byte(accessTokenSecret))
 }
 
-func GenerateRefreshToken(userId, refreshTokenSecret string, expInDays int) (string, error) {
+func GenerateRefreshToken(userID, refreshTokenSecret string, expInDays int) (string, error) {
 	expirationTime := time.Now().Add((time.Hour * 24) * time.Duration(expInDays))
 
 	claims := jwt.RegisteredClaims{
-		Subject:   userId,
+		Subject:   userID,
 		ExpiresAt: jwt.NewNumericDate(expirationTime),
 	}
 

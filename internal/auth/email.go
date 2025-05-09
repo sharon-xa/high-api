@@ -29,7 +29,7 @@ func SendVerificationEmail(userEmail, OTP string, env *config.Env) error {
 }
 
 func SendResetPasswordEmail(email, token string, env *config.Env) error {
-	resetURL := fmt.Sprintf("%s/reset-password/confirm?token=%s", env.FrontendUrl, token)
+	resetURL := fmt.Sprintf("%s/reset-password/confirm?token=%s", env.FrontendURL, token)
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", env.Email)
