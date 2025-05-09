@@ -96,8 +96,28 @@ func (s *Server) getCommentsOfPost(c *gin.Context) {
 		return
 	}
 
+	var exists bool
+	err := s.db.Model(&database.Post{}).
+		Select("1").
+		Where("id = ?", postId).
+		Limit(1).
+		Find(&exists).
+		Error
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+	if !exists {
+		utils.Fail(
+			c,
+			&utils.APIError{Code: http.StatusNotFound, Message: "post not found"},
+			nil,
+		)
+		return
+	}
+
 	var comments []database.Comment
-	err := s.db.Preload("User").
+	err = s.db.Preload("User").
 		Where("post_id = ?", postId).
 		Order("created_at ASC").
 		Find(&comments).
