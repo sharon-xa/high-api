@@ -131,10 +131,17 @@ func (s *Server) getCommentsOfPost(c *gin.Context) {
 }
 
 func (s *Server) addPost(c *gin.Context) {
-	userId := getRequiredFormFieldUInt(c, "userId")
-	if userId == 0 {
+	claims := getAccessClaims(c)
+	if claims == nil {
 		return
 	}
+
+	userId, err := strconv.Atoi(claims.Subject)
+	if err != nil {
+		utils.Fail(c, utils.ErrInternal, err)
+		return
+	}
+
 	categoryId := getRequiredFormFieldUInt(c, "categoryId")
 	if categoryId == 0 {
 		return
@@ -197,7 +204,7 @@ func (s *Server) addPost(c *gin.Context) {
 
 	defer image.Close()
 	p := database.Post{
-		UserID:     userId,
+		UserID:     uint(userId),
 		CategoryID: categoryId,
 		Title:      title,
 		Content:    content,
