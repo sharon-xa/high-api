@@ -49,7 +49,7 @@ func (s *Server) register(c *gin.Context) {
 	}
 
 	err = s.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Create(&u).Error; err != nil {
+		if err = tx.Create(&u).Error; err != nil {
 			if !utils.ValidateUniqueness(c, err, "user") {
 				return err
 			}
@@ -65,7 +65,7 @@ func (s *Server) register(c *gin.Context) {
 			ExpiresAt: expTime,
 		}
 
-		if err := tx.Create(&a).Error; err != nil {
+		if err = tx.Create(&a).Error; err != nil {
 			utils.Fail(c, utils.ErrInternal, err)
 			return err
 		}
@@ -109,7 +109,7 @@ func (s *Server) verifyEmail(c *gin.Context) {
 	}
 
 	otp := database.AccountVerificationOTP{}
-	if err := s.db.Where("user_id = ?", u.ID).First(&otp).Error; err != nil {
+	if err = s.db.Where("user_id = ?", u.ID).First(&otp).Error; err != nil {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
@@ -130,11 +130,11 @@ func (s *Server) verifyEmail(c *gin.Context) {
 
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		u.Verified = true
-		if err := tx.Save(&u).Error; err != nil {
+		if err = tx.Save(&u).Error; err != nil {
 			utils.Fail(c, utils.ErrInternal, err)
 			return err
 		}
-		if err := tx.Delete(&otp).Error; err != nil {
+		if err = tx.Delete(&otp).Error; err != nil {
 			utils.Fail(c, utils.ErrInternal, err)
 			return err
 		}
@@ -165,7 +165,7 @@ func (s *Server) resendVerificationEmail(c *gin.Context) {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
-	verified, userId := user.Verified, user.ID
+	verified, userID := user.Verified, user.ID
 
 	if verified {
 		utils.Success(c, "account already verified", nil)
@@ -175,7 +175,7 @@ func (s *Server) resendVerificationEmail(c *gin.Context) {
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		a := database.AccountVerificationOTP{}
 
-		err := s.db.Where("user_id = ?", userId).First(&a).Error
+		err = s.db.Where("user_id = ?", userID).First(&a).Error
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Fail(c, utils.ErrInternal, err)
 			return err
@@ -187,14 +187,14 @@ func (s *Server) resendVerificationEmail(c *gin.Context) {
 		a.ExpiresAt = expTime
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			a.UserID = userId
+			a.UserID = userID
 
-			if err := tx.Create(&a).Error; err != nil {
+			if err = tx.Create(&a).Error; err != nil {
 				utils.Fail(c, utils.ErrInternal, err)
 				return err
 			}
 		} else {
-			err := s.db.Save(&a).Error
+			err = s.db.Save(&a).Error
 			if err != nil {
 				utils.Fail(c, utils.ErrInternal, err)
 				return err
@@ -212,7 +212,7 @@ func (s *Server) resendVerificationEmail(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, userId)
+	c.JSON(http.StatusOK, userID)
 }
 
 type loginReq struct {
@@ -234,7 +234,7 @@ func (s *Server) login(c *gin.Context) {
 	}
 
 	u := database.User{}
-	if err := s.db.Where("email = ?", req.Email).First(&u).Error; err != nil {
+	if err = s.db.Where("email = ?", req.Email).First(&u).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Fail(c, utils.ErrUnauthorized, nil)
 			return
@@ -267,8 +267,8 @@ func (s *Server) login(c *gin.Context) {
 	}
 
 	// generate refresh and access tokens
-	deviceId := getHeader(c, "Device-ID")
-	if deviceId == "" {
+	deviceID := getHeader(c, "Device-ID")
+	if deviceID == "" {
 		return
 	}
 
@@ -295,7 +295,7 @@ func (s *Server) login(c *gin.Context) {
 
 	// get the refresh token by device id
 	r := database.RefreshToken{}
-	result := s.db.Where("device_id = ?", deviceId).First(&r)
+	result := s.db.Where("device_id = ?", deviceID).First(&r)
 
 	noPrevRefreshToken := errors.Is(result.Error, gorm.ErrRecordNotFound)
 	if result.Error != nil && !noPrevRefreshToken {
@@ -320,7 +320,7 @@ func (s *Server) login(c *gin.Context) {
 			return
 		}
 
-		if r.DeviceID != deviceId {
+		if r.DeviceID != deviceID {
 			utils.Fail(c, utils.ErrBadRequest, errors.New("refresh token might be stolen"))
 			return
 		}
@@ -340,7 +340,7 @@ func (s *Server) login(c *gin.Context) {
 			RefreshToken: hashedRefreshToken,
 			ExpiresAt:    expiresAt,
 			Revoked:      false,
-			DeviceID:     deviceId,
+			DeviceID:     deviceID,
 		}
 
 		err := s.db.Create(&r).Error
@@ -396,14 +396,14 @@ func (s *Server) login(c *gin.Context) {
 }
 
 func (s *Server) logout(c *gin.Context) {
-	deviceId := getHeader(c, "Device-ID")
-	if deviceId == "" {
+	deviceID := getHeader(c, "Device-ID")
+	if deviceID == "" {
 		return
 	}
 
 	var refreshToken database.RefreshToken
 
-	err := s.db.Where("device_id = ?", deviceId).First(&refreshToken).Error
+	err := s.db.Where("device_id = ?", deviceID).First(&refreshToken).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Fail(
@@ -457,13 +457,13 @@ func (s *Server) refreshTokens(c *gin.Context) {
 		return
 	}
 
-	deviceId := getHeader(c, "Device-ID")
-	if deviceId == "" {
+	deviceID := getHeader(c, "Device-ID")
+	if deviceID == "" {
 		return
 	}
 
 	r := database.RefreshToken{}
-	err = s.db.Where("device_id = ?", deviceId).First(&r).Error
+	err = s.db.Where("device_id = ?", deviceID).First(&r).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Fail(
@@ -507,7 +507,7 @@ func (s *Server) refreshTokens(c *gin.Context) {
 		return
 	}
 
-	if deviceId != r.DeviceID {
+	if deviceID != r.DeviceID {
 		utils.Fail(c, utils.ErrStolenToken, errors.New("refresh token might be stolen"))
 		return
 	}
@@ -518,7 +518,7 @@ func (s *Server) refreshTokens(c *gin.Context) {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
-	userId, role, banned := u.ID, u.Role, u.Banned
+	userID, role, banned := u.ID, u.Role, u.Banned
 
 	if banned {
 		utils.Fail(c, &utils.APIError{
@@ -529,7 +529,7 @@ func (s *Server) refreshTokens(c *gin.Context) {
 	}
 
 	newRefreshToken, err := auth.GenerateRefreshToken(
-		strconv.Itoa(int(userId)),
+		strconv.Itoa(int(userID)),
 		s.env.RefreshTokenSecret,
 		s.env.RefreshTokenExpInDays,
 	)
@@ -545,7 +545,7 @@ func (s *Server) refreshTokens(c *gin.Context) {
 	}
 
 	accessToken, err := auth.GenerateAccessToken(
-		strconv.Itoa(int(userId)),
+		strconv.Itoa(int(userID)),
 		string(role),
 		s.env.AccessTokenSecret,
 		s.env.AccessTokenExpInMin,
@@ -605,7 +605,7 @@ func (s *Server) forgotPassword(c *gin.Context) {
 		return
 	}
 
-	userId, verified := user.ID, user.Verified
+	userID, verified := user.ID, user.Verified
 
 	if !verified {
 		utils.Success(
@@ -619,7 +619,7 @@ func (s *Server) forgotPassword(c *gin.Context) {
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		p := database.PasswordResetToken{}
 
-		err := s.db.Where("user_id = ?", userId).First(&p).Error
+		err = s.db.Where("user_id = ?", userID).First(&p).Error
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Fail(c, utils.ErrInternal, err)
 			return err
@@ -635,14 +635,14 @@ func (s *Server) forgotPassword(c *gin.Context) {
 		p.Token = token
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			p.UserID = userId
+			p.UserID = userID
 
-			if err := tx.Create(&p).Error; err != nil {
+			if err = tx.Create(&p).Error; err != nil {
 				utils.Fail(c, utils.ErrInternal, err)
 				return err
 			}
 		} else {
-			err := s.db.Save(&p).Error
+			err = s.db.Save(&p).Error
 			if err != nil {
 				utils.Fail(c, utils.ErrInternal, err)
 				return err
@@ -712,7 +712,7 @@ func (s *Server) resetPassword(c *gin.Context) {
 	}
 
 	err = s.db.Transaction(func(tx *gorm.DB) error {
-		err := tx.Model(&database.User{}).
+		err = tx.Model(&database.User{}).
 			Where("id = ?", p.UserID).
 			Update("password", hashedPassword).Error
 		if err != nil {

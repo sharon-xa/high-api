@@ -48,8 +48,8 @@ func (s *Server) addCategory(c *gin.Context) {
 }
 
 func (s *Server) updateCategory(c *gin.Context) {
-	categoryId := convParamToInt(c, "id")
-	if categoryId == 0 {
+	categoryID := convParamToInt(c, "id")
+	if categoryID == 0 {
 		return
 	}
 
@@ -61,7 +61,7 @@ func (s *Server) updateCategory(c *gin.Context) {
 	}
 
 	var category database.Category
-	err = s.db.First(&category, categoryId).Error
+	err = s.db.First(&category, categoryID).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Fail(c, utils.ErrNotFound, err)
@@ -84,12 +84,12 @@ func (s *Server) updateCategory(c *gin.Context) {
 }
 
 func (s *Server) deleteCategory(c *gin.Context) {
-	categoryId := convParamToInt(c, "id")
-	if categoryId == 0 {
+	categoryID := convParamToInt(c, "id")
+	if categoryID == 0 {
 		return
 	}
 
-	results := s.db.Delete(&database.Category{}, categoryId)
+	results := s.db.Delete(&database.Category{}, categoryID)
 	if results.Error != nil {
 		utils.Fail(c, utils.ErrInternal, results.Error)
 		return

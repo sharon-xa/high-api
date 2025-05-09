@@ -59,8 +59,8 @@ type publicUserResponse struct {
 }
 
 func (s *Server) getUserPublic(c *gin.Context) {
-	userId := convParamToInt(c, "id")
-	if userId == 0 {
+	userID := convParamToInt(c, "id")
+	if userID == 0 {
 		utils.Fail(c, utils.ErrBadRequest, nil)
 		return
 	}
@@ -68,7 +68,7 @@ func (s *Server) getUserPublic(c *gin.Context) {
 	var user publicUserResponse
 	err := s.db.Model(&database.User{}).
 		Select("id", "name", "image", "bio").
-		Where("id = ?", userId).
+		Where("id = ?", userID).
 		First(&user).
 		Error
 	if err != nil {
@@ -153,7 +153,7 @@ func (s *Server) updateUser(c *gin.Context) {
 	}
 
 	var user database.User
-	if err := s.db.First(&user, claims.Subject).Error; err != nil {
+	if err = s.db.First(&user, claims.Subject).Error; err != nil {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}

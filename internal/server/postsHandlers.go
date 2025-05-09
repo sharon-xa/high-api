@@ -36,13 +36,13 @@ type CategoryBrief struct {
 }
 
 func (s *Server) getPost(c *gin.Context) {
-	postId := convParamToInt(c, "id")
-	if postId == 0 {
+	postID := convParamToInt(c, "id")
+	if postID == 0 {
 		return
 	}
 
 	var p database.Post
-	if err := s.db.Preload("User").Preload("Category").Preload("Tags").First(&p, postId).Error; err != nil {
+	if err := s.db.Preload("User").Preload("Category").Preload("Tags").First(&p, postID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Fail(c, utils.ErrNotFound, err)
 			return
@@ -90,8 +90,8 @@ type publicUserSummary struct {
 }
 
 func (s *Server) getCommentsOfPost(c *gin.Context) {
-	postId := convParamToInt(c, "id")
-	if postId == 0 {
+	postID := convParamToInt(c, "id")
+	if postID == 0 {
 		utils.Fail(c, utils.ErrBadRequest, nil)
 		return
 	}
@@ -99,7 +99,7 @@ func (s *Server) getCommentsOfPost(c *gin.Context) {
 	var exists bool
 	err := s.db.Model(&database.Post{}).
 		Select("1").
-		Where("id = ?", postId).
+		Where("id = ?", postID).
 		Limit(1).
 		Find(&exists).
 		Error
@@ -118,7 +118,7 @@ func (s *Server) getCommentsOfPost(c *gin.Context) {
 
 	var comments []database.Comment
 	err = s.db.Preload("User").
-		Where("post_id = ?", postId).
+		Where("post_id = ?", postID).
 		Order("created_at ASC").
 		Find(&comments).
 		Error
@@ -156,14 +156,14 @@ func (s *Server) addPost(c *gin.Context) {
 		return
 	}
 
-	userId, err := strconv.Atoi(claims.Subject)
+	userID, err := strconv.Atoi(claims.Subject)
 	if err != nil {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
 
-	categoryId := getRequiredFormFieldUInt(c, "categoryId")
-	if categoryId == 0 {
+	categoryID := getRequiredFormFieldUInt(c, "categoryId")
+	if categoryID == 0 {
 		return
 	}
 	title := getRequiredFormField(c, "title")
@@ -189,7 +189,7 @@ func (s *Server) addPost(c *gin.Context) {
 			continue
 		}
 		var tag database.Tag
-		err := s.db.Where("name = ?", tagName).
+		err = s.db.Where("name = ?", tagName).
 			FirstOrCreate(&tag, database.Tag{Name: tagName}).
 			Error
 		if err != nil {
@@ -224,8 +224,8 @@ func (s *Server) addPost(c *gin.Context) {
 
 	defer image.Close()
 	p := database.Post{
-		UserID:     uint(userId),
-		CategoryID: categoryId,
+		UserID:     uint(userID),
+		CategoryID: categoryID,
 		Title:      title,
 		Content:    content,
 		Tags:       tags,
@@ -282,8 +282,8 @@ func (s *Server) updatePost(c *gin.Context) {
 		return
 	}
 
-	postId := convParamToInt(c, "id")
-	if postId == 0 {
+	postID := convParamToInt(c, "id")
+	if postID == 0 {
 		utils.Fail(c, utils.ErrBadRequest, errors.New("invalid post ID"))
 		return
 	}
@@ -294,7 +294,7 @@ func (s *Server) updatePost(c *gin.Context) {
 	}
 
 	var post database.Post
-	if err := s.db.Preload("Tags").First(&post, postId).Error; err != nil {
+	if err := s.db.Preload("Tags").First(&post, postID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Fail(c, utils.ErrNotFound, err)
 		} else {
@@ -303,12 +303,12 @@ func (s *Server) updatePost(c *gin.Context) {
 		return
 	}
 
-	userId, err := strconv.Atoi(claims.Subject)
+	userID, err := strconv.Atoi(claims.Subject)
 	if err != nil {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
-	if post.UserID != uint(userId) {
+	if post.UserID != uint(userID) {
 		utils.Fail(
 			c,
 			&utils.APIError{
@@ -349,8 +349,8 @@ func (s *Server) updatePost(c *gin.Context) {
 }
 
 func (s *Server) deletePost(c *gin.Context) {
-	postId := convParamToInt(c, "id")
-	if postId == 0 {
+	postID := convParamToInt(c, "id")
+	if postID == 0 {
 		utils.Fail(c, utils.ErrBadRequest, nil)
 		return
 	}
@@ -361,7 +361,7 @@ func (s *Server) deletePost(c *gin.Context) {
 	}
 
 	var p database.Post
-	err := s.db.First(&p, postId).Error
+	err := s.db.First(&p, postID).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Fail(
@@ -375,12 +375,12 @@ func (s *Server) deletePost(c *gin.Context) {
 		return
 	}
 
-	userId, err := strconv.Atoi(claims.Subject)
+	userID, err := strconv.Atoi(claims.Subject)
 	if err != nil {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
-	if p.UserID != uint(userId) && claims.Role != "admin" {
+	if p.UserID != uint(userID) && claims.Role != "admin" {
 		utils.Fail(
 			c,
 			&utils.APIError{

@@ -42,13 +42,13 @@ func (s *Server) updateTag(c *gin.Context) {
 		return
 	}
 
-	tagId := convParamToInt(c, "id")
-	if tagId == 0 {
+	tagID := convParamToInt(c, "id")
+	if tagID == 0 {
 		return
 	}
 
 	var tag database.Tag
-	if err := s.db.First(&tag, tagId).Error; err != nil {
+	if err := s.db.First(&tag, tagID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Fail(c, utils.ErrNotFound, err)
 		} else {
@@ -75,12 +75,12 @@ func (s *Server) updateTag(c *gin.Context) {
 }
 
 func (s *Server) deleteTag(c *gin.Context) {
-	tagId := convParamToInt(c, "id")
-	if tagId == 0 {
+	tagID := convParamToInt(c, "id")
+	if tagID == 0 {
 		return
 	}
 
-	results := s.db.Delete(&database.Tag{}, tagId)
+	results := s.db.Delete(&database.Tag{}, tagID)
 	if results.Error != nil {
 		utils.Fail(c, utils.ErrInternal, results.Error)
 		return

@@ -28,12 +28,12 @@ func (s *Server) addComment(c *gin.Context) {
 		return
 	}
 
-	postId := convParamToInt(c, "id")
-	if postId == 0 {
+	postID := convParamToInt(c, "id")
+	if postID == 0 {
 		return
 	}
 
-	userId, err := strconv.Atoi(claims.Subject)
+	userID, err := strconv.Atoi(claims.Subject)
 	if err != nil {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
@@ -42,8 +42,8 @@ func (s *Server) addComment(c *gin.Context) {
 	var comment database.Comment
 
 	comment.Content = req.Content
-	comment.PostID = postId
-	comment.UserID = uint(userId)
+	comment.PostID = postID
+	comment.UserID = uint(userID)
 
 	err = s.db.Create(&comment).Error
 	if err != nil {
@@ -84,13 +84,13 @@ func (s *Server) updateComment(c *gin.Context) {
 		return
 	}
 
-	commentId := convParamToInt(c, "id")
-	if commentId == 0 {
+	commentID := convParamToInt(c, "id")
+	if commentID == 0 {
 		return
 	}
 
 	var comment database.Comment
-	err = s.db.First(&comment, commentId).Error
+	err = s.db.First(&comment, commentID).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Fail(
@@ -104,12 +104,12 @@ func (s *Server) updateComment(c *gin.Context) {
 		return
 	}
 
-	userId, err := strconv.Atoi(claims.Subject)
+	userID, err := strconv.Atoi(claims.Subject)
 	if err != nil {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
-	if comment.UserID != uint(userId) {
+	if comment.UserID != uint(userID) {
 		utils.Fail(
 			c,
 			&utils.APIError{
@@ -154,13 +154,13 @@ func (s *Server) deleteComment(c *gin.Context) {
 		return
 	}
 
-	commentId := convParamToInt(c, "id")
-	if commentId == 0 {
+	commentID := convParamToInt(c, "id")
+	if commentID == 0 {
 		return
 	}
 
 	var comment database.Comment
-	if err := s.db.First(&comment, commentId).Error; err != nil {
+	if err := s.db.First(&comment, commentID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Fail(
 				c,
@@ -173,13 +173,13 @@ func (s *Server) deleteComment(c *gin.Context) {
 		return
 	}
 
-	userId, err := strconv.Atoi(claims.Subject)
+	userID, err := strconv.Atoi(claims.Subject)
 	if err != nil {
 		utils.Fail(c, utils.ErrInternal, err)
 		return
 	}
 
-	if comment.UserID != uint(userId) && claims.Role != "admin" {
+	if comment.UserID != uint(userID) && claims.Role != "admin" {
 		utils.Fail(
 			c,
 			&utils.APIError{
