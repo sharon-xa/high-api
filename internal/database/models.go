@@ -8,15 +8,16 @@ import (
 
 type User struct {
 	gorm.Model
-	Name     string
-	Gender   string
-	Image    string
-	Bio      string
-	Email    string `gorm:"unique"`
-	Password string
-	Role     string `gorm:"default:'user'"`
-	Verified bool   `gorm:"default:false"`
-	Banned   bool   `gorm:"default:false"`
+	Name      string
+	Gender    string
+	Image     string
+	Bio       string
+	Email     string `gorm:"unique"`
+	Password  string
+	Role      string    `gorm:"default:'user'"`
+	Verified  bool      `gorm:"default:false"`
+	Banned    bool      `gorm:"default:false"`
+	Birthdate time.Time `gorm:"type:date"      json:"birthdate"`
 
 	Posts                  []Post
 	Comments               []Comment
