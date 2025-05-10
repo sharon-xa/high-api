@@ -14,17 +14,20 @@ import (
 )
 
 type registerReq struct {
-	Name     string `json:"name"     binding:"required"`
-	Email    string `json:"email"    binding:"required"`
-	Gender   string `json:"gender"   binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Name      string `json:"name"      binding:"required"`
+	Email     string `json:"email"     binding:"required"`
+	Gender    string `json:"gender"    binding:"required"`
+	Password  string `json:"password"  binding:"required"`
+	Birthdate string `json:"birthdate" binding:"required"`
+	// use the "YYYY-MM-DD" format.
+	// example: 1998-11-23.
 }
 
 func (s *Server) register(c *gin.Context) {
 	var req registerReq
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		utils.Fail(c, utils.ErrBadRequest, nil)
+		utils.Fail(c, utils.ErrBadRequest, err)
 		return
 	}
 
@@ -39,13 +42,41 @@ func (s *Server) register(c *gin.Context) {
 		role = "admin"
 	}
 
+	layout := "2006-01-02"
+	birthdate, err := time.Parse(layout, req.Birthdate)
+	if err != nil {
+		utils.Fail(c, &utils.APIError{
+			Code:    http.StatusBadRequest,
+			Message: "birthdate must be in YYYY-MM-DD format",
+		}, err)
+		return
+	}
+
+	if birthdate.After(time.Now()) {
+		utils.Fail(c, &utils.APIError{
+			Code:    http.StatusBadRequest,
+			Message: "birthdate cannot be in the future",
+		}, nil)
+		return
+	}
+
+	if time.Since(birthdate) < time.Hour*time.Duration(24*365*s.env.UserMinAge) {
+		utils.Fail(c, &utils.APIError{
+			Code:    http.StatusBadRequest,
+			Message: "you must be at least 10 years old",
+		}, nil)
+		return
+	}
+
 	u := database.User{
-		Name:     req.Name,
-		Email:    req.Email,
-		Gender:   req.Gender,
-		Password: hashedPass,
-		Verified: false,
-		Role:     role,
+		Name:      req.Name,
+		Email:     req.Email,
+		Gender:    req.Gender,
+		Birthdate: birthdate,
+		Password:  hashedPass,
+		Verified:  false,
+		Role:      role,
+		Banned:    false,
 	}
 
 	err = s.db.Transaction(func(tx *gorm.DB) error {

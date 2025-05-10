@@ -15,6 +15,7 @@ type Env struct {
 	OtpExpMin             int    `mapstructure:"OTP_EXP_IN_MIN"`
 	PasswordResetExpInMin int    `mapstructure:"PASSWORD_RESET_EXP_IN_MIN"`
 	APIDomain             string `mapstructure:"API_DOMAIN"`
+	UserMinAge            int    `mapstructure:"USER_MIN_AGE"`
 
 	// Email
 	Email       string `mapstructure:"EMAIL"`
